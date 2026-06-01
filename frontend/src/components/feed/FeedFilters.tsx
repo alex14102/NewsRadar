@@ -11,13 +11,16 @@ const SORT_OPTIONS: { id: SortOrder; label: string }[] = [
 ];
 
 const CATEGORIES: { id: Category; label: string; dot?: string }[] = [
-  { id: "all",     label: "WSZYSTKO" },
-  { id: "news",    label: "WIADOMOŚCI", dot: "#e63946" },
-  { id: "bizweek", label: "BIZWEEK",    dot: "#3a86ff" },
-  { id: "tech",    label: "TECH",       dot: "#7c3aed" },
-  { id: "video",   label: "VIDEO",      dot: "#ff0000" },
-  { id: "social",  label: "SOCIAL",     dot: "#00ff99" },
-  { id: "podcast", label: "PODCAST",    dot: "#f77f00" },
+  { id: "all",         label: "WSZYSTKO" },
+  { id: "news",        label: "WIADOMOŚCI",  dot: "#e63946" },
+  { id: "geopolityka", label: "GEOPOLITYKA", dot: "#0057b8" },
+  { id: "gospodarka",  label: "GOSPODARKA",  dot: "#f4a261" },
+  { id: "biznes",      label: "BIZNES",      dot: "#3a86ff" },
+  { id: "nauka",       label: "NAUKA",       dot: "#06d6a0" },
+  { id: "technologia", label: "TECH",        dot: "#7c3aed" },
+  { id: "video",       label: "VIDEO",       dot: "#ff0000" },
+  { id: "social",      label: "SOCIAL",      dot: "#00ff99" },
+  { id: "podcast",     label: "PODCAST",     dot: "#f77f00" },
 ];
 
 export function FeedFilters() {

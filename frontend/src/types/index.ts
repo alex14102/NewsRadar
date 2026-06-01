@@ -48,4 +48,4 @@ export interface FeedStats {
   bookmarked: number;
 }
 
-export type Category = "all" | "news" | "bizweek" | "tech" | "video" | "social" | "podcast" | "general";
+export type Category = "all" | "news" | "gospodarka" | "biznes" | "geopolityka" | "nauka" | "technologia" | "video" | "social" | "podcast" | "general";
