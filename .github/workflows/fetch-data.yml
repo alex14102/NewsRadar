@@ -31,17 +31,23 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Switch to orphan data branch (or create it)
+          # Stash articles.json outside the worktree before switching branches
+          mv articles.json /tmp/articles.json
+
           git fetch origin data 2>/dev/null || true
           git checkout -B data origin/data 2>/dev/null || git checkout --orphan data
 
-          # Keep only articles.json
+          # Drop everything else from the data branch's working tree + index
           git rm -rf . --quiet 2>/dev/null || true
-          cp $GITHUB_WORKSPACE/articles.json articles.json 2>/dev/null || \
-            mv articles.json articles.json
+          find . -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 
+          mv /tmp/articles.json articles.json
           git add articles.json
-          git diff --cached --quiet && echo "No changes" && exit 0
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+            exit 0
+          fi
 
           git commit -m "data: update articles $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push origin data --force
