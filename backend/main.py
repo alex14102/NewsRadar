@@ -25,9 +25,22 @@ async def scheduled_refresh():
                 print(f"[Scheduler] Error ingesting {source.name}: {e}")
 
 
+async def seed_presets():
+    from routers.sources import PRESET_SOURCES
+    async with SessionLocal() as db:
+        result = await db.execute(select(Source))
+        if result.scalars().first() is None:
+            for preset in PRESET_SOURCES:
+                source = Source(**preset)
+                db.add(source)
+            await db.commit()
+            print("[Startup] Seeded preset sources")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    await seed_presets()
     scheduler.add_job(scheduled_refresh, "interval", minutes=15, id="auto_refresh")
     scheduler.start()
     yield
