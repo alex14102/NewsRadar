@@ -13,6 +13,8 @@ interface NewsStore {
   sidebarOpen: boolean;
   sortOrder: SortOrder;
   settings: UserSettings;
+  readIds: number[];
+  bookmarkedIds: number[];
 
   setActiveCategory: (cat: Category) => void;
   setSelectedArticle: (article: Article | null) => void;
@@ -22,6 +24,10 @@ interface NewsStore {
   setSortOrder: (order: SortOrder) => void;
   updateSettings: (s: Partial<UserSettings>) => void;
   applyTheme: (settings: UserSettings) => void;
+  markRead: (id: number) => void;
+  toggleBookmark: (id: number) => boolean;
+  isRead: (id: number) => boolean;
+  isBookmarked: (id: number) => boolean;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -44,6 +50,8 @@ export const useNewsStore = create<NewsStore>()(
       sidebarOpen: false,
       sortOrder: "date_desc",
       settings: DEFAULT_SETTINGS,
+      readIds: [],
+      bookmarkedIds: [],
 
       setActiveCategory: (cat) => set({ activeCategory: cat }),
       setSelectedArticle: (article) => set({ selectedArticle: article }),
@@ -51,6 +59,25 @@ export const useNewsStore = create<NewsStore>()(
       toggleUnreadOnly: () => set((s) => ({ unreadOnly: !s.unreadOnly })),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
       setSortOrder: (order) => set({ sortOrder: order }),
+
+      markRead: (id) => {
+        if (!get().readIds.includes(id)) {
+          set((s) => ({ readIds: [...s.readIds, id] }));
+        }
+      },
+
+      toggleBookmark: (id) => {
+        const already = get().bookmarkedIds.includes(id);
+        set((s) => ({
+          bookmarkedIds: already
+            ? s.bookmarkedIds.filter((x) => x !== id)
+            : [...s.bookmarkedIds, id],
+        }));
+        return !already;
+      },
+
+      isRead: (id) => get().readIds.includes(id),
+      isBookmarked: (id) => get().bookmarkedIds.includes(id),
 
       updateSettings: (updates) => {
         const next = { ...get().settings, ...updates };
@@ -69,7 +96,13 @@ export const useNewsStore = create<NewsStore>()(
     }),
     {
       name: "newsradar-store",
-      partialize: (s) => ({ settings: s.settings, activeCategory: s.activeCategory, sortOrder: s.sortOrder }),
+      partialize: (s) => ({
+        settings: s.settings,
+        activeCategory: s.activeCategory,
+        sortOrder: s.sortOrder,
+        readIds: s.readIds,
+        bookmarkedIds: s.bookmarkedIds,
+      }),
     }
   )
 );

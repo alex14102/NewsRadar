@@ -1,0 +1,47 @@
+name: Fetch RSS feeds
+
+on:
+  schedule:
+    - cron: "*/20 * * * *"   # every 20 minutes
+  workflow_dispatch:           # manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install feedparser
+        run: pip install feedparser
+
+      - name: Fetch RSS feeds
+        run: python scripts/fetch_feeds.py articles.json
+
+      - name: Push to data branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Switch to orphan data branch (or create it)
+          git fetch origin data 2>/dev/null || true
+          git checkout -B data origin/data 2>/dev/null || git checkout --orphan data
+
+          # Keep only articles.json
+          git rm -rf . --quiet 2>/dev/null || true
+          cp $GITHUB_WORKSPACE/articles.json articles.json 2>/dev/null || \
+            mv articles.json articles.json
+
+          git add articles.json
+          git diff --cached --quiet && echo "No changes" && exit 0
+
+          git commit -m "data: update articles $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push origin data --force
