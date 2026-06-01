@@ -9,14 +9,24 @@ from db.models import Source
 router = APIRouter(prefix="/api/sources", tags=["sources"])
 
 PRESET_SOURCES = [
-    {"name": "Gazeta.pl", "url": "https://rss.gazeta.pl/pub/rss/najnowsze_wyborcza_kraj.xml", "source_type": "rss", "category": "news", "color": "#e63946"},
-    {"name": "Rzeczpospolita", "url": "https://www.rp.pl/rss/1019406", "source_type": "rss", "category": "news", "color": "#457b9d"},
-    {"name": "TVN24", "url": "https://tvn24.pl/najnowsze.xml", "source_type": "rss", "category": "news", "color": "#e9c46a"},
-    {"name": "WP Wiadomości", "url": "https://wiadomosci.wp.pl/rss.xml", "source_type": "rss", "category": "news", "color": "#2a9d8f"},
-    {"name": "Onet Wiadomości", "url": "https://wiadomosci.onet.pl/.feed", "source_type": "rss", "category": "news", "color": "#e76f51"},
-    {"name": "Puls Biznesu", "url": "https://www.pb.pl/rss/najnowsze.xml", "source_type": "rss", "category": "business", "color": "#264653"},
-    {"name": "SpiderWeb", "url": "https://spidersweb.pl/feed", "source_type": "rss", "category": "tech", "color": "#7209b7"},
-    {"name": "AntyWeb", "url": "https://antyweb.pl/feed", "source_type": "rss", "category": "tech", "color": "#4361ee"},
+    # NEWS — polskie wiadomości
+    {"name": "Gazeta.pl",       "url": "https://rss.gazeta.pl/pub/rss/najnowsze_wyborcza_kraj.xml", "source_type": "rss", "category": "news", "color": "#e63946"},
+    {"name": "Rzeczpospolita",  "url": "https://www.rp.pl/rss/1019406",                             "source_type": "rss", "category": "news", "color": "#c1121f"},
+    {"name": "TVN24",           "url": "https://tvn24.pl/najnowsze.xml",                            "source_type": "rss", "category": "news", "color": "#e9c46a"},
+    {"name": "WP Wiadomości",   "url": "https://wiadomosci.wp.pl/rss.xml",                          "source_type": "rss", "category": "news", "color": "#2a9d8f"},
+    {"name": "Onet Wiadomości", "url": "https://wiadomosci.onet.pl/.feed",                          "source_type": "rss", "category": "news", "color": "#e76f51"},
+    # BIZWEEK — biznes + geopolityka
+    {"name": "Puls Biznesu",    "url": "https://www.pb.pl/rss/najnowsze.xml",                       "source_type": "rss", "category": "bizweek", "color": "#3a86ff"},
+    {"name": "Forbes Polska",   "url": "https://www.forbes.pl/feed/rss",                            "source_type": "rss", "category": "bizweek", "color": "#1d6fa4"},
+    {"name": "Politico Europe", "url": "https://www.politico.eu/feed/",                             "source_type": "rss", "category": "bizweek", "color": "#0057b8"},
+    {"name": "Defence24",       "url": "https://defence24.pl/rss.xml",                             "source_type": "rss", "category": "bizweek", "color": "#4a6741"},
+    # TECH
+    {"name": "SpiderWeb",       "url": "https://spidersweb.pl/feed",                               "source_type": "rss", "category": "tech",    "color": "#7c3aed"},
+    {"name": "AntyWeb",         "url": "https://antyweb.pl/feed",                                  "source_type": "rss", "category": "tech",    "color": "#4361ee"},
+    # VIDEO — YouTube
+    {"name": "Damian Olszewski","url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC9TWnOWxa6wdbPEZYYVpJTQ", "source_type": "youtube", "category": "video", "color": "#ff0000"},
+    # SOCIAL — X (Twitter)
+    {"name": "Donald Trump",    "url": "https://x.com/realDonaldTrump",                            "source_type": "x",       "category": "social",  "color": "#e4e4f0"},
 ]
 
 

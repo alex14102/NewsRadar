@@ -1,63 +1,89 @@
 "use client";
-import { motion } from "framer-motion";
 import { useNewsStore } from "@/store/useNewsStore";
+import type { SortOrder } from "@/store/useNewsStore";
 import type { Category } from "@/types";
 import { cn } from "@/lib/utils";
 
-const CATEGORIES: { id: Category; label: string; icon: string }[] = [
-  { id: "all", label: "Wszystko", icon: "◉" },
-  { id: "news", label: "Wiadomości", icon: "📰" },
-  { id: "tech", label: "Technologia", icon: "⚡" },
-  { id: "business", label: "Biznes", icon: "📊" },
-  { id: "social", label: "Social", icon: "𝕏" },
-  { id: "podcast", label: "Podcasty", icon: "🎧" },
+const SORT_OPTIONS: { id: SortOrder; label: string }[] = [
+  { id: "date_desc", label: "NAJNOWSZE" },
+  { id: "date_asc",  label: "NAJSTARSZE" },
+  { id: "source",    label: "ŹRÓDŁO" },
+];
+
+const CATEGORIES: { id: Category; label: string; dot?: string }[] = [
+  { id: "all",     label: "WSZYSTKO" },
+  { id: "news",    label: "WIADOMOŚCI", dot: "#e63946" },
+  { id: "bizweek", label: "BIZWEEK",    dot: "#3a86ff" },
+  { id: "tech",    label: "TECH",       dot: "#7c3aed" },
+  { id: "video",   label: "VIDEO",      dot: "#ff0000" },
+  { id: "social",  label: "SOCIAL",     dot: "#00ff99" },
+  { id: "podcast", label: "PODCAST",    dot: "#f77f00" },
 ];
 
 export function FeedFilters() {
-  const { activeCategory, setActiveCategory, unreadOnly, toggleUnreadOnly } = useNewsStore();
+  const { activeCategory, setActiveCategory, unreadOnly, toggleUnreadOnly, sortOrder, setSortOrder } = useNewsStore();
 
   return (
-    <div className="flex flex-col gap-2 px-4 py-3">
-      {/* Category tabs */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {CATEGORIES.map(({ id, label, icon }) => {
+    <div className="relative z-10 border-b border-[var(--border)]">
+      {/* Category nav */}
+      <div className="flex overflow-x-auto scrollbar-hide">
+        {CATEGORIES.map(({ id, label, dot }) => {
           const active = activeCategory === id;
           return (
             <button
               key={id}
               onClick={() => setActiveCategory(id)}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 shrink-0 relative",
+                "relative flex items-center gap-1.5 px-4 py-3 text-[11px] font-mono font-medium tracking-[0.07em] whitespace-nowrap shrink-0 transition-colors duration-150 border-b-2",
                 active
-                  ? "text-white"
-                  : "glass text-[var(--text-muted)] hover:text-white"
+                  ? "text-white border-[var(--accent)]"
+                  : "text-[var(--text-muted)] border-transparent hover:text-white hover:border-white/20"
               )}
             >
-              {active && (
-                <motion.span
-                  layoutId="filter-active"
-                  className="absolute inset-0 rounded-xl accent-bg opacity-90"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+              {dot && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ background: dot }}
                 />
               )}
-              <span className="relative">{icon}</span>
-              <span className="relative">{label}</span>
+              {label}
             </button>
           );
         })}
       </div>
 
-      {/* Unread toggle */}
-      <div className="flex items-center gap-2">
+      {/* Sub-row: unread + sort */}
+      <div className="flex items-center gap-2 px-4 py-2 overflow-x-auto scrollbar-hide">
         <button
           onClick={toggleUnreadOnly}
           className={cn(
-            "flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors",
-            unreadOnly ? "accent-bg text-white" : "glass text-[var(--text-muted)] hover:text-white"
+            "label flex items-center gap-1.5 px-2.5 py-1 rounded border transition-colors shrink-0",
+            unreadOnly
+              ? "border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-glow)]"
+              : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--border-bright)]"
           )}
         >
-          <span>●</span> Tylko nieprzeczytane
+          <span className={cn("w-1.5 h-1.5 rounded-full", unreadOnly ? "bg-[var(--accent)]" : "bg-[var(--text-muted)]")} />
+          NIEPRZECZYTANE
         </button>
+
+        <span className="label text-[var(--border-bright)] mx-1 shrink-0">|</span>
+        <span className="label text-[var(--text-dim)] shrink-0">SORTUJ:</span>
+
+        {SORT_OPTIONS.map(({ id, label }) => (
+          <button
+            key={id}
+            onClick={() => setSortOrder(id)}
+            className={cn(
+              "label px-2.5 py-1 rounded border transition-colors shrink-0",
+              sortOrder === id
+                ? "border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-glow)]"
+                : "border-transparent text-[var(--text-muted)] hover:text-white"
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
     </div>
   );

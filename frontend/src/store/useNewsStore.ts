@@ -3,23 +3,23 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Article, UserSettings, Category } from "@/types";
 
+export type SortOrder = "date_desc" | "date_asc" | "source";
+
 interface NewsStore {
-  // UI state
   activeCategory: Category;
   selectedArticle: Article | null;
   searchQuery: string;
   unreadOnly: boolean;
   sidebarOpen: boolean;
-
-  // Settings (cached locally)
+  sortOrder: SortOrder;
   settings: UserSettings;
 
-  // Actions
   setActiveCategory: (cat: Category) => void;
   setSelectedArticle: (article: Article | null) => void;
   setSearchQuery: (q: string) => void;
   toggleUnreadOnly: () => void;
   toggleSidebar: () => void;
+  setSortOrder: (order: SortOrder) => void;
   updateSettings: (s: Partial<UserSettings>) => void;
   applyTheme: (settings: UserSettings) => void;
 }
@@ -42,6 +42,7 @@ export const useNewsStore = create<NewsStore>()(
       searchQuery: "",
       unreadOnly: false,
       sidebarOpen: false,
+      sortOrder: "date_desc",
       settings: DEFAULT_SETTINGS,
 
       setActiveCategory: (cat) => set({ activeCategory: cat }),
@@ -49,6 +50,7 @@ export const useNewsStore = create<NewsStore>()(
       setSearchQuery: (q) => set({ searchQuery: q }),
       toggleUnreadOnly: () => set((s) => ({ unreadOnly: !s.unreadOnly })),
       toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
+      setSortOrder: (order) => set({ sortOrder: order }),
 
       updateSettings: (updates) => {
         const next = { ...get().settings, ...updates };
@@ -67,7 +69,7 @@ export const useNewsStore = create<NewsStore>()(
     }),
     {
       name: "newsradar-store",
-      partialize: (s) => ({ settings: s.settings, activeCategory: s.activeCategory }),
+      partialize: (s) => ({ settings: s.settings, activeCategory: s.activeCategory, sortOrder: s.sortOrder }),
     }
   )
 );

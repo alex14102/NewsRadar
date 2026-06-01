@@ -3,7 +3,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Article } from "@/types";
-import { timeAgo, sourceTypeIcon } from "@/lib/utils";
+import { timeAgo } from "@/lib/utils";
 import { markRead, toggleBookmark } from "@/hooks/useFeed";
 import { useNewsStore } from "@/store/useNewsStore";
 
@@ -12,10 +12,24 @@ interface FeedCardProps {
   onMutate: () => void;
 }
 
+const CATEGORY_COLOR: Record<string, string> = {
+  news: "#e63946",
+  bizweek: "#3a86ff",
+  tech: "#7c3aed",
+  social: "#0f9",
+  video: "#ff0000",
+  podcast: "#f77f00",
+  general: "#6b7280",
+};
+
 export function FeedCard({ article, onMutate }: FeedCardProps) {
   const { setSelectedArticle } = useNewsStore();
   const [bookmarked, setBookmarked] = useState(article.is_bookmarked);
   const [read, setRead] = useState(article.is_read);
+
+  const accentColor = article.source_color || "var(--accent)";
+  const isVideo = article.source_type === "youtube";
+  const isX = article.source_type === "x";
 
   const handleOpen = async () => {
     if (!read) {
@@ -33,94 +47,98 @@ export function FeedCard({ article, onMutate }: FeedCardProps) {
     onMutate();
   };
 
-  const accentColor = article.source_color || "var(--accent)";
-
   return (
     <motion.article
-      layout
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      className={`glass rounded-2xl overflow-hidden cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] ${read ? "opacity-60" : ""}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: read ? 0.5 : 1 }}
+      transition={{ duration: 0.2 }}
       onClick={handleOpen}
+      className="card rounded-xl overflow-hidden cursor-pointer"
+      style={{ "--card-accent": accentColor } as React.CSSProperties}
     >
-      {/* Source bar */}
-      <div
-        className="h-0.5 w-full"
-        style={{ background: `linear-gradient(90deg, ${accentColor}, transparent)` }}
-      />
-
-      <div className="p-4 flex gap-3">
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Source + time */}
-          <div className="flex items-center gap-1.5 mb-1.5">
-            <span className="text-xs font-mono text-[var(--text-muted)]">
-              {sourceTypeIcon(article.source_type)}
-            </span>
-            <span
-              className="text-xs font-semibold truncate"
-              style={{ color: accentColor }}
-            >
-              {article.source_name}
-            </span>
-            <span className="text-[10px] font-mono text-[var(--text-dim)] ml-auto shrink-0">
+      <div className="flex gap-0">
+        {/* Main content */}
+        <div className="flex-1 min-w-0 px-4 pt-3 pb-3">
+          {/* Source + time row */}
+          <div className="flex items-center justify-between mb-2 gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              {isVideo && (
+                <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-600/20 text-red-400 border border-red-600/30">
+                  ▶ YT
+                </span>
+              )}
+              {isX && (
+                <span className="shrink-0 text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-600/20 text-emerald-400 border border-emerald-600/30">
+                  𝕏
+                </span>
+              )}
+              <span
+                className="source-tag truncate"
+                style={{ color: accentColor }}
+              >
+                {article.source_name}
+              </span>
+            </div>
+            <span className="label shrink-0 text-[var(--text-dim)]">
               {timeAgo(article.published_at || article.fetched_at)}
             </span>
           </div>
 
-          {/* Title */}
-          <h3 className="text-sm font-semibold leading-snug line-clamp-2 mb-1">
+          {/* Headline */}
+          <h3 className="headline text-[15px] leading-[1.35] mb-2 line-clamp-2 text-[#d8dcf0]">
             {article.title}
           </h3>
 
-          {/* Summary */}
-          {article.summary && (
-            <p className="text-xs text-[var(--text-muted)] line-clamp-2 leading-relaxed">
+          {/* Summary — only if no image or for video */}
+          {article.summary && !article.image_url && (
+            <p className="text-[13px] text-[#5e6080] line-clamp-2 leading-relaxed mb-2">
               {article.summary}
             </p>
           )}
 
-          {/* Tags row */}
-          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+          {/* Footer row */}
+          <div className="flex items-center gap-1.5 flex-wrap">
             {article.is_paywalled && (
-              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
-                🔒 PAYWALL
+              <span className="cat-badge text-[var(--yellow)]">
+                🔒 paywall
               </span>
             )}
             {article.tags?.slice(0, 2).map((tag) => (
-              <span key={tag} className="px-1.5 py-0.5 rounded text-[9px] font-mono glass text-[var(--text-muted)]">
-                #{tag}
+              <span key={tag} className="label px-1.5 py-0.5 rounded bg-white/5">
+                {tag}
               </span>
             ))}
-            {!read && (
-              <span className="w-1.5 h-1.5 rounded-full accent-bg ml-auto shrink-0" />
-            )}
+            <div className="ml-auto flex items-center gap-3">
+              {!read && (
+                <span
+                  className="w-1.5 h-1.5 rounded-full shrink-0"
+                  style={{ background: accentColor }}
+                />
+              )}
+              <button
+                onClick={handleBookmark}
+                className="text-[14px] transition-colors leading-none"
+                style={{ color: bookmarked ? accentColor : "var(--text-dim)" }}
+              >
+                {bookmarked ? "♥" : "♡"}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Thumbnail */}
-        <div className="flex flex-col items-end gap-2 shrink-0">
-          {article.image_url && (
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden glass shrink-0">
-              <Image
-                src={article.image_url}
-                alt=""
-                width={80}
-                height={80}
-                className="w-full h-full object-cover"
-                unoptimized
-              />
-            </div>
-          )}
-          <button
-            onClick={handleBookmark}
-            className={`text-lg transition-all duration-150 ${bookmarked ? "text-[var(--accent)]" : "text-[var(--text-dim)] hover:text-white"}`}
-            title={bookmarked ? "Usuń z zakładek" : "Dodaj do zakładek"}
-          >
-            {bookmarked ? "♥" : "♡"}
-          </button>
-        </div>
+        {/* Thumbnail — right side */}
+        {article.image_url && (
+          <div className="shrink-0 w-[88px] sm:w-[104px] self-stretch overflow-hidden">
+            <Image
+              src={article.image_url}
+              alt=""
+              width={104}
+              height={80}
+              className="w-full h-full object-cover"
+              unoptimized
+            />
+          </div>
+        )}
       </div>
     </motion.article>
   );

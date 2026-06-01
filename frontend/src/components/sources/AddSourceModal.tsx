@@ -7,17 +7,60 @@ interface AddSourceModalProps {
   onClose: () => void;
 }
 
-const SOURCE_TYPES = [
-  { id: "rss", label: "RSS / Atom", icon: "📡" },
-  { id: "x", label: "Profil X (Twitter)", icon: "𝕏" },
-  { id: "spotify", label: "Podcast / Spotify", icon: "🎧" },
-  { id: "youtube", label: "YouTube RSS", icon: "▶" },
+// Quick-add templates for creators
+const CREATOR_TEMPLATES = [
+  {
+    label: "Kanał YouTube",
+    icon: "▶",
+    source_type: "youtube",
+    category: "video",
+    color: "#ff0000",
+    placeholder: "https://youtube.com/feeds/videos.xml?channel_id=UC...",
+    hint: "Wklej URL kanału YouTube lub RSS XML feed",
+  },
+  {
+    label: "Profil X / Twitter",
+    icon: "𝕏",
+    source_type: "x",
+    category: "social",
+    color: "#00ff99",
+    placeholder: "https://x.com/NazwaUżytkownika",
+    hint: "Wklej URL profilu X/Twitter",
+  },
+  {
+    label: "RSS / Artykuły",
+    icon: "📡",
+    source_type: "rss",
+    category: "news",
+    color: "#e63946",
+    placeholder: "https://strona.pl/feed.xml",
+    hint: "Wklej adres RSS/Atom dowolnej strony",
+  },
+  {
+    label: "Podcast",
+    icon: "🎧",
+    source_type: "spotify",
+    category: "podcast",
+    color: "#f77f00",
+    placeholder: "https://open.spotify.com/show/... lub RSS",
+    hint: "Spotify show URL lub bezpośredni RSS podcastu",
+  },
 ];
 
-const CATEGORIES = ["news", "tech", "business", "social", "podcast", "general"];
-const COLORS = ["#e63946", "#457b9d", "#2a9d8f", "#e9c46a", "#7209b7", "#4361ee", "#f77f00", "#06d6a0"];
+const CATEGORIES = [
+  { id: "news",    label: "WIADOMOŚCI" },
+  { id: "bizweek", label: "BIZWEEK" },
+  { id: "tech",    label: "TECH" },
+  { id: "video",   label: "VIDEO" },
+  { id: "social",  label: "SOCIAL" },
+  { id: "podcast", label: "PODCAST" },
+  { id: "general", label: "OGÓLNE" },
+];
+
+const COLORS = ["#e63946","#c1121f","#3a86ff","#1d6fa4","#7c3aed","#4361ee","#ff0000","#f77f00","#00ff99","#ffd166","#06d6a0","#e4e4f0"];
 
 export function AddSourceModal({ onClose }: AddSourceModalProps) {
+  const [template, setTemplate] = useState(CREATOR_TEMPLATES[0]);
   const [form, setForm] = useState<{
     name: string;
     url: string;
@@ -28,16 +71,23 @@ export function AddSourceModal({ onClose }: AddSourceModalProps) {
   }>({
     name: "",
     url: "",
-    source_type: "rss",
-    category: "news",
+    source_type: "youtube",
+    category: "video",
     notify: false,
-    color: COLORS[0],
+    color: "#ff0000",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const set = (key: string, val: any) => setForm((f) => ({ ...f, [key]: val }));
+  const setF = (key: string, val: any) => setForm((f) => ({ ...f, [key]: val }));
+
+  const applyTemplate = (t: typeof CREATOR_TEMPLATES[0]) => {
+    setTemplate(t);
+    setF("source_type", t.source_type);
+    setF("category", t.category);
+    setF("color", t.color);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,117 +106,153 @@ export function AddSourceModal({ onClose }: AddSourceModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4">
       <motion.div
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="w-full sm:max-w-md glass-bright rounded-t-3xl sm:rounded-3xl overflow-hidden"
+        transition={{ type: "spring", damping: 28, stiffness: 280 }}
+        className="w-full sm:max-w-md glass-bright rounded-t-2xl sm:rounded-2xl overflow-hidden max-h-[92dvh] flex flex-col"
       >
-        <div className="w-12 h-1 rounded-full bg-white/20 mx-auto mt-3 mb-4 sm:hidden" />
+        {/* Handle */}
+        <div className="w-10 h-1 rounded-full bg-white/20 mx-auto mt-3 mb-1 sm:hidden shrink-0" />
 
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="font-bold text-lg">Dodaj źródło</h2>
-            <button onClick={onClose} className="w-8 h-8 glass rounded-xl flex items-center justify-center text-[var(--text-muted)] hover:text-white">×</button>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)] shrink-0">
+          <div>
+            <p className="label mb-0.5">NOWE ŹRÓDŁO</p>
+            <h2 className="headline text-base">Dodaj twórcę lub kanał</h2>
           </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 glass rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-white label text-base"
+          >
+            ×
+          </button>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Source type */}
+        <div className="overflow-y-auto flex-1 p-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Type templates */}
             <div>
-              <label className="text-xs font-mono text-[var(--text-muted)] mb-1.5 block">Typ źródła</label>
-              <div className="grid grid-cols-2 gap-1.5">
-                {SOURCE_TYPES.map(({ id, label, icon }) => (
+              <p className="label mb-2">TYP TREŚCI</p>
+              <div className="grid grid-cols-2 gap-2">
+                {CREATOR_TEMPLATES.map((t) => (
                   <button
-                    key={id}
+                    key={t.source_type + t.category}
                     type="button"
-                    onClick={() => set("source_type", id)}
-                    className={`py-2 px-3 rounded-xl text-xs font-medium flex items-center gap-1.5 transition-colors ${
-                      form.source_type === id ? "accent-bg text-white" : "glass hover:text-white"
+                    onClick={() => applyTemplate(t)}
+                    className={`flex items-center gap-2 p-3 rounded-xl text-sm font-medium border transition-all ${
+                      template.source_type === t.source_type && template.category === t.category
+                        ? "border-[var(--accent)] text-white"
+                        : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--border-bright)] hover:text-white"
                     }`}
+                    style={
+                      template.source_type === t.source_type && template.category === t.category
+                        ? { background: `${t.color}15`, borderColor: t.color }
+                        : {}
+                    }
                   >
-                    <span>{icon}</span> {label}
+                    <span
+                      className="text-base w-7 h-7 rounded flex items-center justify-center shrink-0"
+                      style={{ background: t.color + "22", color: t.color }}
+                    >
+                      {t.icon}
+                    </span>
+                    <span className="text-xs font-semibold leading-tight">{t.label}</span>
                   </button>
                 ))}
               </div>
+              {template.hint && (
+                <p className="label mt-1.5 text-[var(--text-dim)]">{template.hint}</p>
+              )}
             </div>
 
             {/* URL */}
             <div>
-              <label className="text-xs font-mono text-[var(--text-muted)] mb-1.5 block">URL źródła *</label>
+              <label className="label mb-1.5 block">URL *</label>
               <input
                 value={form.url}
-                onChange={(e) => set("url", e.target.value)}
-                placeholder={
-                  form.source_type === "x" ? "https://x.com/username" :
-                  form.source_type === "spotify" ? "https://open.spotify.com/show/..." :
-                  "https://example.com/feed.xml"
-                }
-                className="w-full glass rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[var(--accent)] border border-transparent transition-colors"
+                onChange={(e) => setF("url", e.target.value)}
+                placeholder={template.placeholder}
+                className="w-full glass rounded-xl px-4 py-2.5 text-sm outline-none border border-[var(--border)] focus:border-[var(--accent)] transition-colors font-mono"
               />
             </div>
 
             {/* Name */}
             <div>
-              <label className="text-xs font-mono text-[var(--text-muted)] mb-1.5 block">Nazwa (opcjonalna)</label>
+              <label className="label mb-1.5 block">NAZWA</label>
               <input
                 value={form.name}
-                onChange={(e) => set("name", e.target.value)}
-                placeholder="Moje źródło"
-                className="w-full glass rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[var(--accent)] border border-transparent"
+                onChange={(e) => setF("name", e.target.value)}
+                placeholder="np. Damian Olszewski"
+                className="w-full glass rounded-xl px-4 py-2.5 text-sm outline-none border border-[var(--border)] focus:border-[var(--accent)] transition-colors"
               />
             </div>
 
-            {/* Category + Color */}
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="text-xs font-mono text-[var(--text-muted)] mb-1.5 block">Kategoria</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => set("category", e.target.value)}
-                  className="w-full glass rounded-xl px-3 py-2.5 text-sm outline-none"
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c} className="bg-[var(--bg)]">{c}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="text-xs font-mono text-[var(--text-muted)] mb-1.5 block">Kolor</label>
-                <div className="flex gap-1 flex-wrap">
-                  {COLORS.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => set("color", c)}
-                      className={`w-6 h-6 rounded-full transition-transform ${form.color === c ? "scale-125 ring-2 ring-white" : "hover:scale-110"}`}
-                      style={{ background: c }}
-                    />
-                  ))}
-                </div>
+            {/* Category */}
+            <div>
+              <label className="label mb-1.5 block">KATEGORIA</label>
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORIES.map(({ id, label }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setF("category", id)}
+                    className={`label px-3 py-1.5 rounded border transition-colors ${
+                      form.category === id
+                        ? "border-[var(--accent)] text-[var(--accent)] bg-[var(--accent-glow)]"
+                        : "border-[var(--border)] text-[var(--text-muted)] hover:border-[var(--border-bright)]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Notify */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <div
-                onClick={() => set("notify", !form.notify)}
-                className={`w-10 h-5 rounded-full transition-colors relative ${form.notify ? "accent-bg" : "bg-white/10"}`}
-              >
-                <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${form.notify ? "translate-x-5" : "translate-x-0.5"}`} />
+            {/* Color */}
+            <div>
+              <label className="label mb-1.5 block">KOLOR</label>
+              <div className="flex gap-2 flex-wrap">
+                {COLORS.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setF("color", c)}
+                    className={`w-7 h-7 rounded-md transition-transform ${
+                      form.color === c ? "scale-125 ring-2 ring-white ring-offset-1 ring-offset-[var(--bg)]" : "hover:scale-110"
+                    }`}
+                    style={{ background: c }}
+                  />
+                ))}
               </div>
-              <span className="text-sm">Powiadomienia push</span>
+            </div>
+
+            {/* Notify toggle */}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div
+                onClick={() => setF("notify", !form.notify)}
+                className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${form.notify ? "accent-bg" : "bg-white/10"}`}
+              >
+                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.notify ? "translate-x-5.5" : "translate-x-0.5"}`} />
+              </div>
+              <div>
+                <span className="text-sm font-medium">Powiadomienia push</span>
+                <p className="label text-[var(--text-dim)]">Natychmiastowe alerty z tego źródła</p>
+              </div>
             </label>
 
-            {error && <p className="text-xs text-red-400">{error}</p>}
+            {error && (
+              <p className="text-xs font-mono text-red-400 px-1">{error}</p>
+            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl accent-bg text-white font-semibold text-sm disabled:opacity-50"
+              className="w-full py-3 rounded-xl accent-bg text-white font-semibold text-sm disabled:opacity-50 transition-opacity"
             >
-              {loading ? "Dodawanie..." : "Dodaj źródło"}
+              {loading ? "DODAWANIE..." : "DODAJ ŹRÓDŁO"}
             </button>
           </form>
         </div>
