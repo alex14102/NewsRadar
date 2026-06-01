@@ -15,6 +15,7 @@ interface NewsStore {
   settings: UserSettings;
   readIds: number[];
   bookmarkedIds: number[];
+  disabledSources: string[];
 
   setActiveCategory: (cat: Category) => void;
   setSelectedArticle: (article: Article | null) => void;
@@ -28,6 +29,8 @@ interface NewsStore {
   toggleBookmark: (id: number) => boolean;
   isRead: (id: number) => boolean;
   isBookmarked: (id: number) => boolean;
+  toggleSourceEnabled: (name: string) => void;
+  setAllSourcesEnabled: (names: string[], enabled: boolean) => void;
 }
 
 const DEFAULT_SETTINGS: UserSettings = {
@@ -52,6 +55,7 @@ export const useNewsStore = create<NewsStore>()(
       settings: DEFAULT_SETTINGS,
       readIds: [],
       bookmarkedIds: [],
+      disabledSources: [],
 
       setActiveCategory: (cat) => set({ activeCategory: cat }),
       setSelectedArticle: (article) => set({ selectedArticle: article }),
@@ -79,6 +83,18 @@ export const useNewsStore = create<NewsStore>()(
       isRead: (id) => get().readIds.includes(id),
       isBookmarked: (id) => get().bookmarkedIds.includes(id),
 
+      toggleSourceEnabled: (name) => set((s) => ({
+        disabledSources: s.disabledSources.includes(name)
+          ? s.disabledSources.filter((n) => n !== name)
+          : [...s.disabledSources, name],
+      })),
+
+      setAllSourcesEnabled: (names, enabled) => set((s) => ({
+        disabledSources: enabled
+          ? s.disabledSources.filter((n) => !names.includes(n))
+          : Array.from(new Set([...s.disabledSources, ...names])),
+      })),
+
       updateSettings: (updates) => {
         const next = { ...get().settings, ...updates };
         set({ settings: next });
@@ -102,6 +118,7 @@ export const useNewsStore = create<NewsStore>()(
         sortOrder: s.sortOrder,
         readIds: s.readIds,
         bookmarkedIds: s.bookmarkedIds,
+        disabledSources: s.disabledSources,
       }),
     }
   )

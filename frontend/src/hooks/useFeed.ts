@@ -22,7 +22,7 @@ interface UseFeedOptions {
 }
 
 export function useFeed(opts: UseFeedOptions = {}) {
-  const { readIds, bookmarkedIds } = useNewsStore();
+  const { readIds, bookmarkedIds, disabledSources } = useNewsStore();
 
   const apiUrl = isStatic
     ? STATIC_DATA_URL
@@ -54,6 +54,9 @@ export function useFeed(opts: UseFeedOptions = {}) {
     if (!isStatic) return list;
 
     // Client-side filters in static mode
+    if (disabledSources.length > 0) {
+      list = list.filter((a) => !disabledSources.includes(a.source_name));
+    }
     if (opts.category && opts.category !== "all") {
       list = list.filter((a) => a.category === opts.category);
     }
@@ -70,7 +73,7 @@ export function useFeed(opts: UseFeedOptions = {}) {
       );
     }
     return list;
-  }, [rawData, readIds, bookmarkedIds, opts.category, opts.bookmarked, opts.unreadOnly, opts.search]);
+  }, [rawData, readIds, bookmarkedIds, disabledSources, opts.category, opts.bookmarked, opts.unreadOnly, opts.search]);
 
   return { articles, error, isLoading, mutate };
 }

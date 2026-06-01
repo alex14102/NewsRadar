@@ -15,6 +15,7 @@ SOURCES = [
     {"name": "TVN24",            "url": "https://tvn24.pl/najnowsze.xml",                                                "source_type": "rss", "category": "news",        "color": "#e9c46a"},
     {"name": "WP Wiadomości",    "url": "https://wiadomosci.wp.pl/rss.xml",                                              "source_type": "rss", "category": "news",        "color": "#2a9d8f"},
     {"name": "Onet Wiadomości",  "url": "https://wiadomosci.onet.pl/.feed",                                              "source_type": "rss", "category": "news",        "color": "#e76f51"},
+    {"name": "Do Rzeczy",        "url": "https://dorzeczy.pl/feed",                                                      "source_type": "rss", "category": "news",        "color": "#8b2c2c"},
     {"name": "New York Times",   "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",                        "source_type": "rss", "category": "news",        "color": "#1a1a1a"},
     # GEOPOLITYKA
     {"name": "Politico Europe",  "url": "https://www.politico.eu/feed/",                                                 "source_type": "rss", "category": "geopolityka", "color": "#0057b8"},
