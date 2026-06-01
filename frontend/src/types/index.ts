@@ -4,6 +4,7 @@ export interface Article {
   source_name: string;
   source_color: string | null;
   source_type: string;
+  category?: Category;
   title: string;
   url: string;
   summary: string | null;

@@ -55,7 +55,7 @@ export function useFeed(opts: UseFeedOptions = {}) {
 
     // Client-side filters in static mode
     if (opts.category && opts.category !== "all") {
-      list = list.filter((a) => (a as any).category === opts.category);
+      list = list.filter((a) => a.category === opts.category);
     }
     if (opts.bookmarked) {
       list = list.filter((a) => bookmarkedIds.includes(a.id));
