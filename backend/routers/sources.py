@@ -20,9 +20,14 @@ PRESET_SOURCES = [
     {"name": "Forbes Polska",   "url": "https://www.forbes.pl/feed/rss",                            "source_type": "rss", "category": "bizweek", "color": "#1d6fa4"},
     {"name": "Politico Europe", "url": "https://www.politico.eu/feed/",                             "source_type": "rss", "category": "bizweek", "color": "#0057b8"},
     {"name": "Defence24",       "url": "https://defence24.pl/rss.xml",                             "source_type": "rss", "category": "bizweek", "color": "#4a6741"},
+    # NEWS — international
+    {"name": "New York Times",  "url": "https://rss.nytimes.com/services/xml/rss/nyt/World.xml",  "source_type": "rss", "category": "news",    "color": "#000000"},
+    # BIZWEEK — international
+    {"name": "Forbes",          "url": "https://www.forbes.com/business/feed/",                   "source_type": "rss", "category": "bizweek", "color": "#c9a227"},
     # TECH
     {"name": "SpiderWeb",       "url": "https://spidersweb.pl/feed",                               "source_type": "rss", "category": "tech",    "color": "#7c3aed"},
     {"name": "AntyWeb",         "url": "https://antyweb.pl/feed",                                  "source_type": "rss", "category": "tech",    "color": "#4361ee"},
+    {"name": "BBC Science",     "url": "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", "source_type": "rss", "category": "tech", "color": "#ff6b35"},
     # VIDEO — YouTube
     {"name": "Damian Olszewski","url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC9TWnOWxa6wdbPEZYYVpJTQ", "source_type": "youtube", "category": "video", "color": "#ff0000"},
     # SOCIAL — X (Twitter)
