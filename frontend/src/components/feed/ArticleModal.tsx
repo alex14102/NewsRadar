@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNewsStore } from "@/store/useNewsStore";
+import { API_BASE } from "@/lib/api";
 
 export function ArticleModal() {
   const { selectedArticle, setSelectedArticle } = useNewsStore();
@@ -17,7 +18,7 @@ export function ArticleModal() {
 
   const fetchBypassUrls = async () => {
     if (!selectedArticle) return;
-    const res = await fetch("/api/paywall/bypass", {
+    const res = await fetch(`${API_BASE}/api/paywall/bypass`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: selectedArticle.url }),
@@ -30,7 +31,7 @@ export function ArticleModal() {
     if (!selectedArticle) return;
     setBypassLoading(true);
     try {
-      const res = await fetch(`/api/paywall/fetch?url=${encodeURIComponent(selectedArticle.url)}`);
+      const res = await fetch(`${API_BASE}/api/paywall/fetch?url=${encodeURIComponent(selectedArticle.url)}`);
       const data = await res.json();
       setBypassContent(data.content ?? "Nie udało się pobrać treści.");
     } finally {

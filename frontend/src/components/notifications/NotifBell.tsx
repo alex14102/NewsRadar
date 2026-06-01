@@ -1,10 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNewsStore } from "@/store/useNewsStore";
+import { API_BASE } from "@/lib/api";
 
 export function NotifBell() {
-  const { settings } = useNewsStore();
+  useNewsStore();
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,11 +26,11 @@ export function NotifBell() {
       const existing = await reg.pushManager.getSubscription();
 
       if (existing) {
-        await fetch("/api/push/unsubscribe?endpoint=" + encodeURIComponent(existing.endpoint), { method: "DELETE" });
+        await fetch(`${API_BASE}/api/push/unsubscribe?endpoint=` + encodeURIComponent(existing.endpoint), { method: "DELETE" });
         await existing.unsubscribe();
         setSubscribed(false);
       } else {
-        const keyRes = await fetch("/api/push/vapid-key");
+        const keyRes = await fetch(`${API_BASE}/api/push/vapid-key`);
         const { publicKey } = await keyRes.json();
         if (!publicKey) return;
 
@@ -38,7 +39,7 @@ export function NotifBell() {
           applicationServerKey: publicKey,
         });
         const json = sub.toJSON();
-        await fetch("/api/push/subscribe", {
+        await fetch(`${API_BASE}/api/push/subscribe`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: sub.endpoint, keys: json.keys }),

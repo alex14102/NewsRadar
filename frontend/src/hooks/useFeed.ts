@@ -1,6 +1,7 @@
 "use client";
 import useSWR from "swr";
 import type { Article, FeedStats, Category } from "@/types";
+import { API_BASE } from "@/lib/api";
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -23,7 +24,7 @@ export function useFeed(opts: UseFeedOptions = {}) {
   if (opts.page) params.set("page", String(opts.page));
 
   const { data, error, isLoading, mutate } = useSWR<Article[]>(
-    `/api/feed?${params.toString()}`,
+    `${API_BASE}/api/feed?${params.toString()}`,
     fetcher,
     { refreshInterval: 5 * 60 * 1000, revalidateOnFocus: false }
   );
@@ -32,23 +33,25 @@ export function useFeed(opts: UseFeedOptions = {}) {
 }
 
 export function useFeedStats() {
-  const { data } = useSWR<FeedStats>("/api/feed/stats", fetcher, {
+  const { data } = useSWR<FeedStats>(`${API_BASE}/api/feed/stats`, fetcher, {
     refreshInterval: 60_000,
   });
   return data ?? { total: 0, unread: 0, bookmarked: 0 };
 }
 
 export async function markRead(id: number) {
-  await fetch(`/api/feed/${id}/read`, { method: "PATCH" });
+  await fetch(`${API_BASE}/api/feed/${id}/read`, { method: "PATCH" });
 }
 
 export async function toggleBookmark(id: number) {
-  const res = await fetch(`/api/feed/${id}/bookmark`, { method: "PATCH" });
+  const res = await fetch(`${API_BASE}/api/feed/${id}/bookmark`, { method: "PATCH" });
   return res.json();
 }
 
 export async function refreshFeed(sourceId?: number) {
-  const url = sourceId ? `/api/feed/refresh?source_id=${sourceId}` : "/api/feed/refresh";
+  const url = sourceId
+    ? `${API_BASE}/api/feed/refresh?source_id=${sourceId}`
+    : `${API_BASE}/api/feed/refresh`;
   const res = await fetch(url, { method: "POST" });
   return res.json();
 }

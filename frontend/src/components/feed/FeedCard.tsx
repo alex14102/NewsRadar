@@ -12,15 +12,6 @@ interface FeedCardProps {
   onMutate: () => void;
 }
 
-const CATEGORY_COLOR: Record<string, string> = {
-  news: "#e63946",
-  bizweek: "#3a86ff",
-  tech: "#7c3aed",
-  social: "#0f9",
-  video: "#ff0000",
-  podcast: "#f77f00",
-  general: "#6b7280",
-};
 
 export function FeedCard({ article, onMutate }: FeedCardProps) {
   const { setSelectedArticle } = useNewsStore();

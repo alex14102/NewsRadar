@@ -1,6 +1,5 @@
 "use client";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { FeedList } from "@/components/feed/FeedList";
 import { ArticleModal } from "@/components/feed/ArticleModal";
 import { useNewsStore } from "@/store/useNewsStore";
 import { useFeed } from "@/hooks/useFeed";
