@@ -1,76 +1,142 @@
 """Monitor: tracks progress of one or more concurrent erase jobs and
-renders a live-updating Rich dashboard (progress bars, speed, ETA, and
-periodic SMART temperature polling)."""
+renders a live-updating Rich progress bar per device (pass number,
+speed, ETA, temperature, status), plus periodic SMART temperature
+polling in the background."""
 
 import threading
 import time
-from dataclasses import dataclass, field
 from typing import Dict, Optional
 
-from rich.live import Live
-from rich.table import Table
+from rich.progress import (
+    BarColumn,
+    Progress,
+    ProgressColumn,
+    SpinnerColumn,
+    TextColumn,
+    TimeRemainingColumn,
+)
+from rich.text import Text
 
 from .disk_scanner import human_size
 
+STATUS_STYLES = {
+    "running": "cyan",
+    "success": "bold green",
+    "failed": "bold red",
+    "interrupted": "bold yellow",
+    "blocked": "bold red",
+}
 
-@dataclass
-class JobState:
-    device: str
-    method: str
-    bytes_written: int = 0
-    bytes_total: int = 0
-    pass_index: int = 1
-    total_passes: int = 1
-    status: str = "running"
-    started_at: float = field(default_factory=time.time)
-    last_update: float = field(default_factory=time.time)
-    last_bytes: int = 0
-    speed_bps: float = 0.0
-    temperature_c: Optional[int] = None
+
+class PassColumn(ProgressColumn):
+    def render(self, task):
+        pass_index = task.fields.get("pass_index", 1)
+        total_passes = task.fields.get("total_passes", 1)
+        return Text(f"przebieg {pass_index}/{total_passes}", style="magenta")
+
+
+class SpeedColumn(ProgressColumn):
+    def render(self, task):
+        speed = task.fields.get("speed_bps", 0.0)
+        return Text(f"{human_size(speed)}/s", style="cyan")
+
+
+class TemperatureColumn(ProgressColumn):
+    def render(self, task):
+        temp = task.fields.get("temperature_c")
+        text = f"{temp}C" if temp is not None else "--"
+        style = "red" if isinstance(temp, (int, float)) and temp >= 55 else "yellow"
+        return Text(text, style=style)
+
+
+class StatusColumn(ProgressColumn):
+    def render(self, task):
+        status = task.fields.get("status", "running")
+        return Text(status, style=STATUS_STYLES.get(status, "white"))
 
 
 class Monitor:
     def __init__(self, settings, smart_manager=None):
         self.settings = settings
         self.smart_manager = smart_manager
-        self._jobs: Dict[str, JobState] = {}
         self._lock = threading.Lock()
+        self._task_ids: Dict[str, int] = {}
+        self._last_update: Dict[str, float] = {}
+        self._last_bytes: Dict[str, int] = {}
         self._smart_stop = threading.Event()
         self._smart_thread: Optional[threading.Thread] = None
 
+        self.progress = Progress(
+            SpinnerColumn(),
+            TextColumn("[bold]{task.fields[device]}[/bold]"),
+            TextColumn("{task.fields[standard]}"),
+            BarColumn(bar_width=30),
+            TextColumn("[progress.percentage]{task.percentage:>5.1f}%"),
+            PassColumn(),
+            SpeedColumn(),
+            TimeRemainingColumn(),
+            TemperatureColumn(),
+            StatusColumn(),
+            transient=False,
+            refresh_per_second=self.settings.monitor_refresh_per_second,
+        )
+
     # ------------------------------------------------------------------
-    def register_job(self, device: str, method: str, total_passes: int = 1):
+    def register_job(self, device: str, method: str, standard: str = "", total_passes: int = 1):
         with self._lock:
-            self._jobs[device] = JobState(device=device, method=method, total_passes=total_passes)
+            task_id = self.progress.add_task(
+                device,
+                total=1,
+                device=device,
+                method=method,
+                standard=standard,
+                pass_index=1,
+                total_passes=total_passes,
+                speed_bps=0.0,
+                temperature_c=None,
+                status="running",
+            )
+            self._task_ids[device] = task_id
+            self._last_update[device] = time.time()
+            self._last_bytes[device] = 0
 
     def progress_callback(self, device, bytes_written, bytes_total, pass_index, total_passes):
         with self._lock:
-            job = self._jobs.get(device)
-            if job is None:
-                job = JobState(device=device, method="?", total_passes=total_passes)
-                self._jobs[device] = job
+            task_id = self._task_ids.get(device)
+            if task_id is None:
+                return
             now = time.time()
-            elapsed = now - job.last_update
+            elapsed = now - self._last_update.get(device, now)
+            speed = None
             if elapsed > 0.2:
-                delta_bytes = bytes_written - job.last_bytes
-                instantaneous = delta_bytes / elapsed if elapsed > 0 else 0
-                job.speed_bps = (job.speed_bps * 0.6) + (instantaneous * 0.4)
-                job.last_update = now
-                job.last_bytes = bytes_written
-            job.bytes_written = bytes_written
-            job.bytes_total = bytes_total
-            job.pass_index = pass_index
-            job.total_passes = total_passes
+                delta_bytes = bytes_written - self._last_bytes.get(device, 0)
+                instantaneous = delta_bytes / elapsed if elapsed > 0 else 0.0
+                task = self.progress.tasks[task_id]
+                previous_speed = task.fields.get("speed_bps", 0.0)
+                speed = (previous_speed * 0.6) + (instantaneous * 0.4)
+                self._last_update[device] = now
+                self._last_bytes[device] = bytes_written
+
+            update_kwargs = dict(
+                completed=bytes_written,
+                total=max(bytes_total, 1),
+                pass_index=pass_index,
+                total_passes=total_passes,
+            )
+            if speed is not None:
+                update_kwargs["speed_bps"] = speed
+            self.progress.update(task_id, **update_kwargs)
 
     def finish_job(self, device: str, status: str):
         with self._lock:
-            job = self._jobs.get(device)
-            if job:
-                job.status = status
-
-    def snapshot(self):
-        with self._lock:
-            return {k: JobState(**vars(v)) for k, v in self._jobs.items()}
+            task_id = self._task_ids.get(device)
+            if task_id is None:
+                return
+            task = self.progress.tasks[task_id]
+            update_kwargs = {"status": status}
+            if status == "success":
+                update_kwargs["completed"] = task.total
+            self.progress.update(task_id, **update_kwargs)
 
     # ------------------------------------------------------------------
     def start_smart_polling(self, devices):
@@ -83,9 +149,9 @@ class Monitor:
                 for device in devices:
                     report = self.smart_manager.get_smart_data(device)
                     with self._lock:
-                        job = self._jobs.get(device)
-                        if job and report.available:
-                            job.temperature_c = report.temperature_c
+                        task_id = self._task_ids.get(device)
+                        if task_id is not None and report.available:
+                            self.progress.update(task_id, temperature_c=report.temperature_c)
                 self._smart_stop.wait(self.settings.smart_poll_seconds)
 
         self._smart_thread = threading.Thread(target=poll, daemon=True)
@@ -97,45 +163,15 @@ class Monitor:
             self._smart_thread.join(timeout=2)
 
     # ------------------------------------------------------------------
-    def render_table(self) -> Table:
-        table = Table(title="Postep operacji wymazywania", expand=True)
-        table.add_column("Urzadzenie")
-        table.add_column("Metoda")
-        table.add_column("Przebieg")
-        table.add_column("Postep")
-        table.add_column("Predkosc")
-        table.add_column("ETA")
-        table.add_column("Temp.")
-        table.add_column("Status")
+    def live(self):
+        """Returns the underlying rich.progress.Progress instance, which
+        is itself a context manager that starts/stops a Live display."""
+        return self.progress
 
-        for job in self.snapshot().values():
-            pct = (job.bytes_written / job.bytes_total * 100) if job.bytes_total else 0.0
-            remaining_bytes = max(0, job.bytes_total - job.bytes_written)
-            eta = remaining_bytes / job.speed_bps if job.speed_bps > 1 else None
-            eta_text = f"{eta:6.0f}s" if eta is not None else "--"
-            temp_text = f"{job.temperature_c}C" if job.temperature_c is not None else "--"
-            status_style = {
-                "running": "cyan",
-                "success": "bold green",
-                "failed": "bold red",
-                "interrupted": "bold yellow",
-                "blocked": "bold red",
-            }.get(job.status, "white")
-            table.add_row(
-                job.device,
-                job.method,
-                f"{job.pass_index}/{job.total_passes}",
-                f"{pct:5.1f}% ({human_size(job.bytes_written)}/{human_size(job.bytes_total)})",
-                f"{human_size(job.speed_bps)}/s",
-                eta_text,
-                temp_text,
-                f"[{status_style}]{job.status}[/{status_style}]",
-            )
-        return table
-
-    def live(self) -> Live:
-        return Live(
-            self.render_table(),
-            refresh_per_second=self.settings.monitor_refresh_per_second,
-            transient=False,
-        )
+    def reset(self):
+        with self._lock:
+            for task_id in list(self._task_ids.values()):
+                self.progress.remove_task(task_id)
+            self._task_ids.clear()
+            self._last_update.clear()
+            self._last_bytes.clear()

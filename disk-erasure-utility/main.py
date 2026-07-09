@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app.crypto_detector import CryptoDetector  # noqa: E402
 from app.disk_scanner import DiskScanner, human_size  # noqa: E402
-from app.erase_manager import ALL_METHODS, EraseManager, SecurityError  # noqa: E402
+from app.erase_manager import ALL_METHODS, METHODS, METHODS_BY_ID, EraseManager, SecurityError  # noqa: E402
 from app.logger import JsonLogger  # noqa: E402
 from app.main_menu import MainMenu  # noqa: E402
 from app.monitor import Monitor  # noqa: E402
@@ -51,11 +51,19 @@ def cmd_crypto(args):
     print(info)
 
 
+def cmd_methods(args):
+    for spec in METHODS:
+        passes = str(len(spec.passes)) if spec.passes else "sprzetowo"
+        print(f"{spec.id}\t{spec.standard}\t{passes} przebiegow\t{spec.label}")
+
+
 def cmd_erase(args):
     settings, logger, disk_scanner = build_context(args)
     erase_manager = EraseManager(settings, logger, disk_scanner)
     report_manager = ReportManager(settings, logger)
-    monitor = Monitor(settings)
+    smart_manager = SmartManager(logger, settings.smartctl_path)
+    monitor = Monitor(settings, smart_manager)
+    spec = METHODS_BY_ID[args.method]
 
     try:
         erase_manager.assert_safe_to_erase(args.device)
@@ -64,12 +72,28 @@ def cmd_erase(args):
         sys.exit(2)
 
     if not args.yes:
-        confirm = input(f"Type WYMAZ to permanently erase {args.device} with method '{args.method}': ")
+        confirm = input(
+            f"Type WYMAZ to permanently erase {args.device} with method "
+            f"'{args.method}' ({spec.standard}): "
+        )
         if confirm.strip() != "WYMAZ":
             print("Aborted.")
             sys.exit(1)
 
-    result = erase_manager.erase(args.device, args.method, progress_callback=monitor.progress_callback)
+    monitor.register_job(
+        args.device, args.method, standard=spec.standard,
+        total_passes=len(spec.passes) if spec.passes else 1,
+    )
+    monitor.start_smart_polling([args.device])
+    try:
+        with monitor.live():
+            result = erase_manager.erase(
+                args.device, args.method, progress_callback=monitor.progress_callback
+            )
+    finally:
+        monitor.stop_smart_polling()
+    monitor.finish_job(args.device, result.status)
+
     report_manager.save(result)
     print(f"Status: {result.status}, duration: {result.duration_sec:.1f}s")
     sys.exit(0 if result.status == "success" else 1)
@@ -105,6 +129,9 @@ def build_parser():
     crypto_parser = subparsers.add_parser("crypto", help="Detect encryption on a device")
     crypto_parser.add_argument("device")
     crypto_parser.set_defaults(func=cmd_crypto)
+
+    methods_parser = subparsers.add_parser("methods", help="List erase methods and their standards")
+    methods_parser.set_defaults(func=cmd_methods)
 
     erase_parser = subparsers.add_parser("erase", help="Erase a device")
     erase_parser.add_argument("device")

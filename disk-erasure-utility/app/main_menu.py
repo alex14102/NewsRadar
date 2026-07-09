@@ -11,7 +11,7 @@ from rich.table import Table
 
 from .crypto_detector import CryptoDetector
 from .disk_scanner import DiskScanner, human_size
-from .erase_manager import ALL_METHODS, EraseManager, SecurityError
+from .erase_manager import ALL_METHODS, METHODS, METHODS_BY_ID, EraseManager, SecurityError
 from .logger import JsonLogger
 from .monitor import Monitor
 from .report_manager import ReportManager
@@ -220,6 +220,21 @@ class MainMenu:
         self.console.print(table)
 
     # ------------------------------------------------------------------
+    # Erase methods (ISO/IEC 27040-referenced sanitization standards)
+    # ------------------------------------------------------------------
+    def _methods_table(self):
+        table = Table(title="Metody wymazywania (normy niszczenia danych)", expand=True)
+        table.add_column("ID", no_wrap=True)
+        table.add_column("Nazwa", no_wrap=True)
+        table.add_column("Norma / standard", no_wrap=True)
+        table.add_column("Przebiegi", justify="right", no_wrap=True)
+        table.add_column("Opis", overflow="ellipsis", max_width=48)
+        for spec in METHODS:
+            passes = str(len(spec.passes)) if spec.passes else "sprzetowo"
+            table.add_row(spec.id, spec.label, spec.standard, passes, spec.description)
+        return table
+
+    # ------------------------------------------------------------------
     # Erase flow
     # ------------------------------------------------------------------
     def _erase_flow(self):
@@ -245,9 +260,17 @@ class MainMenu:
         if not allowed:
             return
 
-        self.console.print(f"Dostepne metody: {', '.join(ALL_METHODS)}")
+        self.console.print(self._methods_table())
         method = Prompt.ask(
-            "Wybierz metode wymazywania", choices=list(ALL_METHODS), default=self.settings.default_method
+            "Wybierz metode wymazywania (ID)", choices=list(ALL_METHODS), default=self.settings.default_method
+        )
+        spec = METHODS_BY_ID[method]
+        self.console.print(
+            Panel(
+                f"{spec.label}\nNorma: {spec.standard}\n{spec.description}",
+                title="Wybrana metoda",
+                style="cyan",
+            )
         )
 
         self.console.print(
@@ -267,8 +290,10 @@ class MainMenu:
         self._run_erase_jobs(allowed, method)
 
     def _run_erase_jobs(self, disks, method):
+        spec = METHODS_BY_ID[method]
+        self.monitor.reset()
         for disk in disks:
-            self.monitor.register_job(disk.path, method)
+            self.monitor.register_job(disk.path, method, standard=spec.standard, total_passes=spec.passes and len(spec.passes) or 1)
         self.monitor.start_smart_polling([d.path for d in disks])
 
         results = {}
@@ -294,8 +319,10 @@ class MainMenu:
             smart_info = vars(self.smart_manager.get_smart_data(disk.path))
             self.report_manager.save(result, disk_info=vars(disk), smart_info=smart_info)
 
-        self.console.print(self.monitor.render_table())
-        self.console.print("[green]Zakonczono operacje wymazywania.[/green]")
+        succeeded = sum(1 for r in results.values() if r.status == "success")
+        self.console.print(
+            f"[green]Zakonczono: {succeeded}/{len(disks)} operacji zakonczonych sukcesem.[/green]"
+        )
 
     def _erase_one(self, disk, method):
         try:
