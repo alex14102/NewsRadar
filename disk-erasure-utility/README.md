@@ -31,6 +31,15 @@ w konfiguracji lub flaga `--yes` w trybie CLI.
   `hdparm` (ATA Secure Erase), `nvme-cli` (NVMe format), `util-linux`
   (`blkdiscard`, `lsblk`, `findmnt`).
 
+## Pobranie
+
+```bash
+git clone https://github.com/alex14102/NewsRadar.git
+cd NewsRadar
+git checkout claude/disk-erasure-utility-3ncnnr
+cd disk-erasure-utility
+```
+
 ## Instalacja
 
 ```bash
@@ -38,15 +47,16 @@ w konfiguracji lub flaga `--yes` w trybie CLI.
 ```
 
 Skrypt wykrywa menedzer pakietow (`apt`, `dnf`, `pacman`), instaluje
-zaleznosci systemowe, tworzy wirtualne srodowisko `.venv` i instaluje
-pakiety z `requirements.txt`.
+zaleznosci systemowe (`smartmontools`, `hdparm`, `nvme-cli`, `util-linux`)
+oraz biblioteki Python z `requirements.txt` **bezposrednio na maszynie**
+(bez virtualenv), tak aby narzedzie dzialalo od razu po `sudo python3 main.py`.
 
-Instalacja reczna:
+Instalacja reczna (bez skryptu):
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+pip3 install -r requirements.txt
+# lub na dystrybucjach z PEP 668 (Debian/Ubuntu 23.04+):
+pip3 install --break-system-packages -r requirements.txt
 ```
 
 ## Uzycie
@@ -54,7 +64,7 @@ pip install -r requirements.txt
 ### Tryb interaktywny (menu)
 
 ```bash
-sudo .venv/bin/python main.py
+sudo python3 main.py
 ```
 
 Menu pozwala: skanowac dyski, przegladac SMART, wykrywac szyfrowanie,
@@ -65,22 +75,22 @@ temperatury), przegladac raporty oraz zmieniac ustawienia domyslne.
 
 ```bash
 # lista urzadzen blokowych
-sudo .venv/bin/python main.py scan
+sudo python3 main.py scan
 
 # dane SMART konkretnego dysku
-sudo .venv/bin/python main.py smart /dev/sdb
+sudo python3 main.py smart /dev/sdb
 
 # wykrycie szyfrowania na partycji
-sudo .venv/bin/python main.py crypto /dev/sdb1
+sudo python3 main.py crypto /dev/sdb1
 
 # wymazanie dysku metoda 3-przebiegowa DoD, z potwierdzeniem
-sudo .venv/bin/python main.py erase /dev/sdb --method dod3
+sudo python3 main.py erase /dev/sdb --method dod3
 
 # jak wyzej, bez pytania o potwierdzenie (np. w skryptach automatyzacji)
-sudo .venv/bin/python main.py erase /dev/sdb --method zero --yes
+sudo python3 main.py erase /dev/sdb --method zero --yes
 
 # lista zapisanych raportow
-.venv/bin/python main.py reports
+python3 main.py reports
 ```
 
 ## Metody wymazywania
