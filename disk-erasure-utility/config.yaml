@@ -1,0 +1,37 @@
+# Disk Erasure Utility - example configuration.
+# This file is created automatically with these defaults on first run
+# if it does not already exist.
+
+logging:
+  level: INFO          # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  path: logs/app.jsonl # JSON-lines log, one operation/command/error per line
+
+reports:
+  path: reports        # directory where JSON erase reports are written
+  formats: [json]
+
+erase:
+  default_method: zero # zero, random, dod3, dod7, blkdiscard, secure-erase, nvme-format
+  threads: 2           # max concurrent disks being erased at once
+  chunk_size_mb: 4      # write buffer size per I/O operation
+  verify: true          # sample-read the device after the last pass
+  confirm_required: true # require typing WYMAZ before an erase starts
+
+smart:
+  enabled: true
+  smartctl_path: smartctl
+
+crypto:
+  enabled: true
+  blkid_path: blkid
+  cryptsetup_path: cryptsetup
+
+safety:
+  # Extra device paths that must never be erasable, on top of the
+  # automatically detected system disk, boot media and live USB medium.
+  protected_extra: []
+  block_virtual_devices: true # always refuse /dev/loop*, /dev/ram*, /dev/zram*
+
+monitor:
+  refresh_per_second: 4
+  smart_poll_seconds: 5
