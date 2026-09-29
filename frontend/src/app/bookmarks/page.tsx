@@ -14,7 +14,7 @@ export default function BookmarksPage() {
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-0 z-40 glass-bright border-b border-white/8 safe-top">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl accent-bg flex items-center justify-center text-white font-bold text-sm">N</div>
+          <div className="w-8 h-8 chamfer-sm accent-bg flex items-center justify-center text-white font-bold text-sm">N</div>
           <h1 className="font-bold text-lg">Zapisane ♥</h1>
           {!isLoading && (
             <span className="ml-auto text-xs font-mono text-[var(--text-muted)]">{articles.length} artykułów</span>

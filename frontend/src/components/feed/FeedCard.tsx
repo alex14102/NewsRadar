@@ -44,7 +44,7 @@ export function FeedCard({ article, onMutate }: FeedCardProps) {
       animate={{ opacity: read ? 0.5 : 1 }}
       transition={{ duration: 0.2 }}
       onClick={handleOpen}
-      className="card rounded-xl overflow-hidden cursor-pointer"
+      className="card overflow-hidden cursor-pointer"
       style={{ "--card-accent": accentColor } as React.CSSProperties}
     >
       <div className="flex gap-0">
@@ -76,13 +76,13 @@ export function FeedCard({ article, onMutate }: FeedCardProps) {
           </div>
 
           {/* Headline */}
-          <h3 className="headline text-[15px] leading-[1.35] mb-2 line-clamp-2 text-[#d8dcf0]">
+          <h3 className="headline text-[15px] leading-[1.35] mb-2 line-clamp-2 text-[var(--text)]">
             {article.title}
           </h3>
 
           {/* Summary — only if no image or for video */}
           {article.summary && !article.image_url && (
-            <p className="text-[13px] text-[#5e6080] line-clamp-2 leading-relaxed mb-2">
+            <p className="text-[13px] text-[var(--text-muted)] line-clamp-2 leading-relaxed mb-2">
               {article.summary}
             </p>
           )}

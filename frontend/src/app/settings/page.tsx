@@ -14,7 +14,7 @@ export default function SettingsPage() {
     <div className="min-h-dvh flex flex-col">
       <header className="sticky top-0 z-40 glass-bright border-b border-white/8 safe-top">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl accent-bg flex items-center justify-center text-white font-bold text-sm">N</div>
+          <div className="w-8 h-8 chamfer-sm accent-bg flex items-center justify-center text-white font-bold text-sm">N</div>
           <h1 className="font-bold text-lg">Ustawienia</h1>
         </div>
       </header>
@@ -63,7 +63,7 @@ export default function SettingsPage() {
         <div className="glass rounded-2xl p-5 space-y-2">
           <p className="text-xs font-mono text-[var(--text-muted)] uppercase tracking-wider mb-3">O aplikacji</p>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl accent-bg flex items-center justify-center text-white font-bold">N</div>
+            <div className="w-10 h-10 chamfer-sm accent-bg flex items-center justify-center text-white font-bold">N</div>
             <div>
               <p className="font-bold">NewsRadar</p>
               <p className="text-xs text-[var(--text-muted)]">v1.0.0 · Agregator informacji</p>

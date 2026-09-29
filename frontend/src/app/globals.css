@@ -4,35 +4,45 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Motyw „Twierdza” — paleta z okładki książki „Twierdza Linux” (Sekurak):
+   grafitowo-morskie tło, limonkowy akcent, turkus jako drugi kolor. */
 :root {
-  --accent-hue: 210;
-  --accent:      hsl(var(--accent-hue) 80% 62%);
-  --accent-dim:  hsl(var(--accent-hue) 60% 38%);
-  --accent-glow: hsl(var(--accent-hue) 80% 62% / 0.18);
-  --bg:          #04040a;
-  --bg-panel:    #0a0a14;
-  --surface:     rgba(255,255,255,0.04);
-  --surface-hover: rgba(255,255,255,0.07);
-  --border:      rgba(255,255,255,0.08);
-  --border-bright: rgba(255,255,255,0.14);
-  --text:        #d8dcf0;
-  --text-muted:  #5e6080;
-  --text-dim:    rgba(255,255,255,0.28);
-  --red:         #ff3b5c;
-  --green:       #00d68f;
-  --yellow:      #ffd166;
+  --accent-hue: 64;
+  --accent:      hsl(var(--accent-hue) 74% 56%);
+  --accent-dim:  hsl(var(--accent-hue) 45% 34%);
+  --accent-glow: hsl(var(--accent-hue) 74% 56% / 0.16);
+  --accent-ink:  #121a1c;          /* tekst na tle akcentu */
+  --teal:        #33c3ae;
+  --trace:       hsl(64 40% 45% / 0.14); /* linie „płytki drukowanej” w tle */
+  --bg:          #172023;
+  --bg-center:   #2b373a;
+  --bg-panel:    rgba(23,32,35,0.86);
+  --surface:     rgba(210,230,220,0.045);
+  --surface-hover: rgba(210,230,220,0.08);
+  --border:      rgba(200,225,160,0.10);
+  --border-bright: rgba(200,225,160,0.18);
+  --text:        #e9eee4;
+  --text-muted:  #8a9a92;
+  --text-dim:    rgba(233,238,228,0.36);
+  --red:         #ff4d5e;
+  --green:       #33c3ae;
+  --yellow:      #d9e33f;
 }
 
 .light {
-  --bg:          #f2f3f9;
-  --bg-panel:    #eaecf5;
-  --surface:     rgba(0,0,0,0.04);
-  --surface-hover: rgba(0,0,0,0.07);
-  --border:      rgba(0,0,0,0.08);
-  --border-bright: rgba(0,0,0,0.14);
-  --text:        #14162a;
-  --text-muted:  #5a5c78;
-  --text-dim:    rgba(0,0,0,0.28);
+  --accent:      hsl(var(--accent-hue) 70% 38%);
+  --accent-ink:  #ffffff;
+  --trace:       hsl(180 20% 30% / 0.08);
+  --bg:          #eef1ea;
+  --bg-center:   #f8faf5;
+  --bg-panel:    rgba(238,241,234,0.9);
+  --surface:     rgba(20,40,40,0.04);
+  --surface-hover: rgba(20,40,40,0.07);
+  --border:      rgba(20,40,40,0.10);
+  --border-bright: rgba(20,40,40,0.18);
+  --text:        #15201f;
+  --text-muted:  #56655f;
+  --text-dim:    rgba(20,40,40,0.36);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -44,7 +54,10 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 45%, var(--bg-center), transparent 75%),
+    var(--bg);
+  background-attachment: fixed;
   color: var(--text) !important;
   font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   font-size: 15px;
@@ -53,15 +66,35 @@ body {
   overflow-x: hidden;
 }
 
-/* Dot grid */
+/* Tło: ścieżki jak na płytce drukowanej, ze ściętymi pod 45° narożnikami (jak na okładce) */
 body::after {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
-  background-size: 28px 28px;
+  background-color: var(--trace);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='black' stroke-width='1.2'%3E%3Cpath d='M0 40h90l40 40v90l30 30h80'/%3E%3Cpath d='M20 240v-60l30-30h40'/%3E%3Cpath d='M170 0v50l30 30h40'/%3E%3Cpath d='M130 170h-30' stroke-dasharray='4 6'/%3E%3Ccircle cx='90' cy='150' r='2.5' fill='black'/%3E%3Ccircle cx='240' cy='80' r='2.5' fill='black'/%3E%3C/svg%3E") 0 0 / 240px 240px repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' fill='none' stroke='black' stroke-width='1.2'%3E%3Cpath d='M0 40h90l40 40v90l30 30h80'/%3E%3Cpath d='M20 240v-60l30-30h40'/%3E%3Cpath d='M170 0v50l30 30h40'/%3E%3Cpath d='M130 170h-30' stroke-dasharray='4 6'/%3E%3Ccircle cx='90' cy='150' r='2.5' fill='black'/%3E%3Ccircle cx='240' cy='80' r='2.5' fill='black'/%3E%3C/svg%3E") 0 0 / 240px 240px repeat;
   pointer-events: none;
   z-index: 0;
+}
+
+/* Ścięty narożnik (prawy górny i lewy dolny), jak panele na okładce */
+.chamfer {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.chamfer-sm {
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+}
+
+/* Etykieta-banner: limonkowy pasek ze ściętymi bokami, jak nazwisko autora na okładce */
+.tag-banner {
+  background: var(--accent);
+  color: var(--accent-ink);
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+  font-family: 'Barlow Condensed', 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 /* Glass panels */
@@ -80,22 +113,32 @@ body::after {
 
 /* News cards — editorial, left-border accent */
 .card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #d8dcf0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 0 !important;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
   position: relative;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 .card:hover {
-  background: rgba(255,255,255,0.065);
-  border-color: rgba(255,255,255,0.14);
+  background: var(--surface-hover);
+  border-color: var(--border-bright);
+}
+/* Limonkowy „znacznik” w ściętym rogu karty */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 26px; height: 26px;
+  background: linear-gradient(225deg, transparent 0 11.5px, var(--accent) 11.5px 15px, transparent 15px);
+  opacity: 0.9;
 }
 .card::before {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 3px;
-  border-radius: 2px 0 0 2px;
   background: var(--card-accent, var(--accent));
   z-index: 1;
 }
@@ -103,7 +146,7 @@ body::after {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 3px; height: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--accent-dim); border-radius: 0; }
 
 /* Typography utilities */
 .label {
@@ -117,7 +160,15 @@ body::after {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: #d8dcf0;
+  color: var(--text);
+}
+/* Nagłówki w stylu tytułu okładki: wąskie, grube wersaliki */
+.display {
+  font-family: 'Barlow Condensed', 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 0.95;
 }
 .source-tag {
   font-family: 'Barlow Condensed', 'Space Grotesk', sans-serif;
@@ -139,14 +190,15 @@ body::after {
 
 /* Accent */
 .accent { color: var(--accent) !important; }
-.accent-bg { background: var(--accent) !important; }
+.accent-bg { background: var(--accent) !important; color: var(--accent-ink) !important; }
 .accent-border { border-color: var(--accent) !important; }
 .accent-glow { box-shadow: 0 0 24px var(--accent-glow); }
 
 /* Live accent bar */
 .live-bar {
-  height: 2px;
-  background: linear-gradient(90deg, var(--accent), transparent);
+  height: 3px;
+  background:
+    linear-gradient(90deg, var(--accent) 0 38%, transparent 38% 40%, var(--teal) 40% 52%, transparent 52% 54%, var(--accent-dim) 54% 60%, transparent 60%);
 }
 
 /* Font sizes */

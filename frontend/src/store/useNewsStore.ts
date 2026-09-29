@@ -36,7 +36,7 @@ interface NewsStore {
 const DEFAULT_SETTINGS: UserSettings = {
   id: 1,
   theme: "dark",
-  accent_hue: 210,
+  accent_hue: 64,
   font_size: "md",
   language: "pl",
   notifications_enabled: true,

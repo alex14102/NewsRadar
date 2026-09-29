@@ -55,7 +55,7 @@ class UserSettings(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
     theme: Mapped[str] = mapped_column(String(20), default="dark")
-    accent_hue: Mapped[int] = mapped_column(Integer, default=210)  # HSL hue
+    accent_hue: Mapped[int] = mapped_column(Integer, default=64)  # HSL hue
     font_size: Mapped[str] = mapped_column(String(20), default="md")
     language: Mapped[str] = mapped_column(String(10), default="pl")
     notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True)

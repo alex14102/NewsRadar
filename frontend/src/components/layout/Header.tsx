@@ -47,21 +47,11 @@ export function Header() {
         {/* Wordmark */}
         {!searchOpen && (
           <div className="flex items-center gap-2.5 shrink-0 min-w-0">
-            <div
-              className="w-7 h-7 rounded flex items-center justify-center accent-bg shrink-0"
-              style={{ fontFamily: "'Barlow Condensed',sans-serif", fontWeight: 700, fontSize: 14 }}
-            >
-              N
+            <div className="tag-banner h-7 pl-4 pr-5 flex items-center text-[17px] leading-none shrink-0">
+              <span className="sm:hidden">NR</span>
+              <span className="hidden sm:inline">NEWSRADAR</span>
             </div>
-            <div className="hidden sm:flex flex-col leading-none">
-              <span
-                className="text-[13px] font-bold tracking-[0.12em] text-white"
-                style={{ fontFamily: "'Barlow Condensed',sans-serif" }}
-              >
-                NEWSRADAR
-              </span>
-              <span className="label text-[8px]">INTELLIGENCE FEED</span>
-            </div>
+            <span className="label text-[8px] hidden sm:block text-[var(--teal)]">/PROC/FEED</span>
           </div>
         )}
 

@@ -2,6 +2,7 @@
 import { useSettings } from "@/hooks/useSettings";
 
 const ACCENT_PRESETS = [
+  { label: "Twierdza", hue: 64 },
   { label: "Niebieski", hue: 210 },
   { label: "Fioletowy", hue: 270 },
   { label: "Zielony", hue: 145 },
@@ -9,7 +10,6 @@ const ACCENT_PRESETS = [
   { label: "Pomarańczowy", hue: 30 },
   { label: "Różowy", hue: 330 },
   { label: "Turkusowy", hue: 175 },
-  { label: "Złoty", hue: 45 },
 ];
 
 export function ThemePicker() {

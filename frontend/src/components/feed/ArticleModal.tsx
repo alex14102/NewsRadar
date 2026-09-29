@@ -155,7 +155,7 @@ export function ArticleModal() {
               href={selectedArticle.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex-1 py-2.5 rounded-xl accent-bg text-white text-sm font-semibold text-center"
+              className="flex-1 py-2.5 chamfer-sm accent-bg text-white text-sm font-semibold text-center"
             >
               Otwórz artykuł →
             </a>

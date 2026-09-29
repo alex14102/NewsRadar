@@ -250,7 +250,7 @@ export function AddSourceModal({ onClose }: AddSourceModalProps) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-xl accent-bg text-white font-semibold text-sm disabled:opacity-50 transition-opacity"
+              className="w-full py-3 chamfer-sm accent-bg text-white font-semibold text-sm disabled:opacity-50 transition-opacity"
             >
               {loading ? "DODAWANIE..." : "DODAJ ŹRÓDŁO"}
             </button>
