@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Fiszki — statystyki</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#D6EA3C}a:hover{color:#E8F57A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: radial-gradient(120% 80% at 50% 35%, #263334 0%, #1C2627 60%, #182122 100%); font-family: Barlow, system-ui, sans-serif; color: #E6EDEA; display: flex; flex-direction: column; position: relative; overflow: hidden">
+
+  <div style="position: absolute; right: -50px; top: 150px; width: 240px; height: 1px; background: #3A4A4B; transform: rotate(-45deg)"></div>
+  <div style="position: absolute; left: 8px; top: 36px; width: 3px; height: 40px; background: #34C3AE"></div>
+
+  <div style="padding: 28px 20px 0 24px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A9C9B; letter-spacing: 1px">/PROC/STATS</span>
+    <h1 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 700; line-height: 1; letter-spacing: 0.5px">STATYSTYKI</h1>
+  </div>
+
+  <div style="margin: 20px 20px 0; display: flex; gap: 10px">
+    <div style="flex: 1; background: #D6EA3C; color: #141A12; clip-path: polygon(18px 0, 100% 0, 100% 100%, 0 100%, 0 18px); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1px">STREAK</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 700; line-height: 0.9">12<span style="font-size: 22px"> DNI</span></span>
+    </div>
+    <div style="flex: 1; background: #47585A; padding: 1px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%)">
+      <div style="height: 100%; box-sizing: border-box; background: #1E2829; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 17.6px), calc(100% - 17.6px) 100%, 0 100%); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8A9C9B; letter-spacing: 1px">SKUTECZNOŚĆ</span>
+        <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 700; line-height: 0.9; color: #34C3AE">91%</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 22px 20px 0; display: flex; justify-content: space-between; align-items: baseline">
+    <h2 style="margin: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 0.5px">OSTATNIE 7 DNI</h2>
+    <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A9C9B">KARTY/DZIEŃ</span>
+  </div>
+
+  <div style="margin: 12px 20px 0; height: 200px; border-bottom: 1px solid #47585A; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: end; position: relative">
+    <div style="position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: repeating-linear-gradient(90deg, #3A4A4B 0 4px, transparent 4px 8px)"></div>
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8A9C9B">{{d.n}}</span>
+        <div style="{{d.bar}}"></div>
+      </div>
+    </sc-for>
+  </div>
+  <div style="margin: 6px 20px 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px">
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+      <span style="text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A9C9B">{{d.day}}</span>
+    </sc-for>
+  </div>
+
+  <div style="margin: 22px 20px 0; display: flex; flex-direction: column; gap: 0; border-top: 1px solid #3A4A4B">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
+      <div style="display: flex; justify-content: space-between; align-items: center; min-height: 44px; border-bottom: 1px solid #3A4A4B">
+        <span style="font-size: 15px; font-weight: 500">{{r.k}}</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #D6EA3C">{{r.v}}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <nav style="position: absolute; left: 0; right: 0; bottom: 0; height: 76px; background: #182122; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #3A4A4B">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #8A9C9B; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9l3-3h10v14H4z"></path><path d="M9 3h11v12"></path></svg>
+      TALIE
+    </a>
+    <a href="Stats.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #D6EA3C; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; position: relative">
+      <span style="position: absolute; top: -1px; left: 30%; right: 30%; height: 3px; background: #D6EA3C"></span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M5 20V11M12 20V5M19 20v-6"></path></svg>
+      STATY
+    </a>
+    <a href="Theme.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-decoration: none; color: #8A9C9B; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h10l4 4v10l-4 4H7l-4-4V7z"></path><path d="M12 7v10M7 12h10"></path></svg>
+      WYGLĄD
+    </a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const data = [['PN', 32], ['WT', 45], ['ŚR', 18], ['CZ', 51], ['PT', 27], ['SB', 38], ['ND', 22]];
+    const max = 51;
+    const days = data.map(([day, n], i) => {
+      const today = i === data.length - 1;
+      const h = Math.round((n / max) * 160);
+      const fill = today ? 'repeating-linear-gradient(-45deg, #D6EA3C 0 4px, #8FA02A 4px 8px)' : '#34C3AE';
+      return { day, n, bar: 'width: 100%; height: ' + h + 'px; background: ' + fill + '; clip-path: polygon(0 6px, 6px 0, 100% 0, 100% 100%, 0 100%)' };
+    });
+    return {
+      days,
+      rows: [
+        { k: 'Wszystkie karty', v: '624' },
+        { k: 'Opanowane', v: '388' },
+        { k: 'Czas nauki w tym tygodniu', v: '2H 41M' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

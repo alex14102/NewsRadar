@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Fiszki — wygląd</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#D6EA3C}a:hover{color:#E8F57A}
+button{font:inherit}
+</style>
+</helmet>
+<div style="{{s.root}}">
+
+  <div style="padding: 20px 16px 0; display: flex; align-items: center; gap: 8px">
+    <a href="Main.dc.html" aria-label="Wróć" style="{{s.back}}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M15 5l-7 7 7 7"></path></svg>
+    </a>
+    <div style="flex: 1; display: flex; flex-direction: column">
+      <span style="{{s.mono10}}">/SYS/THEME</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.05">WYGLĄD</span>
+    </div>
+  </div>
+
+  <div style="padding: 16px 20px 0">
+    <div style="{{s.label}}">&gt; PODGLĄD</div>
+    <div style="{{s.previewOuter}}">
+      <div style="{{s.previewInner}}">
+        <div style="display: flex; justify-content: space-between; align-items: center">
+          <span style="{{s.mono10}}">_FRONT // EN</span>
+          <sc-if value="{{hatch}}" hint-placeholder-val="{{ true }}">
+            <span style="{{s.hatch}}"></span>
+          </sc-if>
+        </div>
+        <span style="{{s.word}}">RELUCTANT</span>
+        <span style="{{s.ipa}}">/rɪˈlʌk.tənt/</span>
+        <div style="{{s.answer}}">niechętny, oporny</div>
+        <span style="{{s.cta}}">POKAŻ_ODPOWIEDŹ</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 20px 20px 0">
+    <div style="{{s.label}}">&gt; MOTYW</div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{presets}}" as="p" hint-placeholder-count="5">
+        <button type="button" onClick="{{p.pick}}" aria-pressed="{{p.pressed}}" style="{{p.style}}">
+          <span style="display: flex; gap: 4px">
+            <span style="{{p.sw1}}"></span><span style="{{p.sw2}}"></span><span style="{{p.sw3}}"></span>
+          </span>
+          <span style="{{p.nameStyle}}">{{p.name}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="padding: 20px 20px 0">
+    <div style="{{s.label}}">&gt; KOLOR AKCENTU</div>
+    <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{accents}}" as="a" hint-placeholder-count="6">
+        <button type="button" onClick="{{a.pick}}" aria-label="{{a.label}}" aria-pressed="{{a.pressed}}" style="{{a.style}}"></button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="padding: 20px 20px 0">
+    <div style="{{s.label}}">&gt; KSZTAŁTY I DETALE</div>
+    <sc-for list="{{toggles}}" as="t" hint-placeholder-count="3">
+      <button type="button" onClick="{{t.flip}}" aria-pressed="{{t.on}}" style="{{s.toggleRow}}">
+        <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px">
+          <span style="font-size: 16px; font-weight: 600">{{t.label}}</span>
+          <span style="{{s.mono10}}">{{t.hint}}</span>
+        </span>
+        <span style="{{t.track}}"><span style="{{t.knob}}"></span></span>
+      </button>
+    </sc-for>
+  </div>
+
+  <div style="padding: 20px 20px 0">
+    <div style="{{s.label}}">&gt; ROZMIAR TEKSTU FISZKI</div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <sc-for list="{{sizes}}" as="z" hint-placeholder-count="3">
+        <button type="button" onClick="{{z.pick}}" aria-pressed="{{z.pressed}}" style="{{z.style}}">{{z.label}}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="padding: 24px 20px 28px; margin-top: auto; display: flex; gap: 10px">
+    <button type="button" onClick="{{reset}}" style="{{s.secondary}}">RESET</button>
+    <a href="Main.dc.html" style="{{s.primary}}">ZAPISZ_MOTYW</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: 'cyber', accent: null, chamfer: true, hatch: true, deco: true, size: 'M' };
+  }
+  renderVals() {
+    const P = {
+      cyber: { name: 'CYBER', bg: '#1C2627', glow: '#263334', surface: '#1E2829', raised: '#2E3B3C', line: '#47585A', ink: '#E6EDEA', muted: '#8A9C9B', primary: '#34C3AE', onPrimary: '#0F1A1A', accent: '#D6EA3C', onAccent: '#141A12' },
+      neon: { name: 'NEON', bg: '#1A1726', glow: '#272140', surface: '#211D30', raised: '#2E2942', line: '#4A4462', ink: '#EEEAF7', muted: '#9D96B5', primary: '#E0479E', onPrimary: '#1A0F18', accent: '#4FE3F0', onAccent: '#0F1A1C' },
+      amber: { name: 'AMBER TERM', bg: '#1E1A14', glow: '#2C261C', surface: '#26211A', raised: '#332C22', line: '#5A4E3C', ink: '#F2EBDD', muted: '#A89A82', primary: '#E8A23A', onPrimary: '#1A1206', accent: '#F2E3B3', onAccent: '#1A1206' },
+      ice: { name: 'ICE', bg: '#16202B', glow: '#1F2D3B', surface: '#1C2834', raised: '#263544', line: '#3F5163', ink: '#E6F0F8', muted: '#8EA3B6', primary: '#5AA9F0', onPrimary: '#0A1520', accent: '#E6F1FA', onAccent: '#0A1520' },
+      paper: { name: 'PAPIER', bg: '#ECEEE8', glow: '#F6F7F3', surface: '#FFFFFF', raised: '#DDE1D8', line: '#AEB6AB', ink: '#161A16', muted: '#545C53', primary: '#1F8F7E', onPrimary: '#FFFFFF', accent: '#161A16', onAccent: '#D6EA3C' }
+    };
+    const A = [
+      { c: '#D6EA3C', on: '#141A12', label: 'Limonka' },
+      { c: '#34C3AE', on: '#0F1A1A', label: 'Turkus' },
+      { c: '#FF5C8A', on: '#1A0F14', label: 'Róż neon' },
+      { c: '#4FE3F0', on: '#0F1A1C', label: 'Cyjan' },
+      { c: '#F2A93B', on: '#1A140A', label: 'Bursztyn' },
+      { c: '#B49CFF', on: '#140F1F', label: 'Fiolet' }
+    ];
+    const st = this.state;
+    const t = P[st.theme];
+    const ac = st.accent ? A.find((x) => x.c === st.accent) : null;
+    const acc = ac ? ac.c : t.accent;
+    const onAcc = ac ? ac.on : t.onAccent;
+    const cut = (n) => st.chamfer
+      ? 'clip-path: polygon(' + n + 'px 0, 100% 0, 100% calc(100% - ' + n + 'px), calc(100% - ' + n + 'px) 100%, 0 100%, 0 ' + n + 'px); '
+      : 'border-radius: ' + Math.min(n, 14) + 'px; ';
+    const cutIn = (n) => st.chamfer
+      ? 'clip-path: polygon(' + (n - 0.4) + 'px 0, 100% 0, 100% calc(100% - ' + (n - 0.4) + 'px), calc(100% - ' + (n - 0.4) + 'px) 100%, 0 100%, 0 ' + (n - 0.4) + 'px); '
+      : 'border-radius: ' + (Math.min(n, 14) - 1) + 'px; ';
+    const wordSize = { S: 34, M: 42, L: 52 }[st.size];
+    const mono = "font-family: 'JetBrains Mono', monospace; ";
+
+    const s = {
+      root: 'width: 390px; min-height: 1180px; box-sizing: border-box; background: radial-gradient(120% 60% at 50% 20%, ' + t.glow + ' 0%, ' + t.bg + ' 65%); font-family: Barlow, system-ui, sans-serif; color: ' + t.ink + '; display: flex; flex-direction: column; transition: background 0.3s',
+      back: 'width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: ' + t.ink,
+      mono10: mono + 'font-size: 10px; letter-spacing: 1px; color: ' + t.muted + (st.deco ? '' : '; display: none'),
+      label: mono + 'font-size: 11px; letter-spacing: 1px; color: ' + acc + '; margin-bottom: 10px; ' + (st.theme === 'paper' && !ac ? 'color: ' + t.primary : ''),
+      previewOuter: 'background: ' + t.line + '; padding: 1px; ' + cut(20),
+      previewInner: 'background: ' + t.surface + '; ' + cutIn(20) + 'padding: 18px 18px 16px; display: flex; flex-direction: column; gap: 8px',
+      hatch: 'width: 44px; height: 12px; background: repeating-linear-gradient(-45deg, ' + acc + ' 0 3px, transparent 3px 7px)',
+      word: "font-family: 'Barlow Condensed', sans-serif; font-weight: 700; line-height: 0.95; font-size: " + wordSize + 'px',
+      ipa: mono + 'font-size: 13px; color: ' + t.primary,
+      answer: 'background: ' + t.primary + '; color: ' + t.onPrimary + "; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px; padding: 10px 14px; " + cut(12),
+      cta: 'align-self: stretch; text-align: center; background: ' + acc + '; color: ' + onAcc + '; ' + mono + 'font-size: 12px; font-weight: 700; letter-spacing: 1.5px; padding: 14px; ' + cut(10),
+      toggleRow: 'width: 100%; min-height: 56px; background: none; border: 0; border-bottom: 1px solid ' + t.line + '; color: ' + t.ink + '; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; cursor: pointer; text-align: left',
+      secondary: 'flex: 1; min-height: 56px; border: 0; cursor: pointer; background: ' + t.raised + '; color: ' + t.ink + '; ' + mono + 'font-size: 13px; font-weight: 700; letter-spacing: 1px; ' + cut(12),
+      primary: 'flex: 2; min-height: 56px; display: flex; align-items: center; justify-content: center; text-decoration: none; background: ' + acc + '; color: ' + onAcc + '; ' + mono + 'font-size: 13px; font-weight: 700; letter-spacing: 1px; ' + cut(12)
+    };
+
+    const presets = Object.keys(P).map((k) => {
+      const p = P[k];
+      const sel = st.theme === k;
+      const sw = (c) => 'width: 18px; height: 18px; background: ' + c + '; outline: 1px solid ' + t.line;
+      return {
+        name: p.name,
+        pressed: sel ? 'true' : 'false',
+        pick: () => this.setState({ theme: k, accent: null }),
+        sw1: sw(p.bg), sw2: sw(p.primary), sw3: sw(p.accent),
+        nameStyle: mono + 'font-size: 12px; font-weight: 700; letter-spacing: 1px; color: ' + (sel ? acc : t.ink) + (st.theme === 'paper' && sel && !ac ? '; color: ' + t.primary : ''),
+        style: 'min-height: 64px; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding: 10px 12px; background: ' + t.surface + '; color: ' + t.ink + '; border: 2px solid ' + (sel ? (st.theme === 'paper' && !ac ? t.primary : acc) : t.line) + '; ' + cut(10)
+      };
+    });
+
+    const accents = A.map((x) => {
+      const sel = acc === x.c;
+      return {
+        label: x.label,
+        pressed: sel ? 'true' : 'false',
+        pick: () => this.setState({ accent: x.c }),
+        style: 'height: 44px; cursor: pointer; background: ' + x.c + '; border: 0; box-shadow: ' + (sel ? '0 0 0 2px ' + t.bg + ', 0 0 0 4px ' + x.c : 'none') + '; ' + cut(8)
+      };
+    });
+
+    const tg = (key, label, hint) => {
+      const on = st[key];
+      return {
+        label, hint,
+        on: on ? 'true' : 'false',
+        flip: () => this.setState({ [key]: !on }),
+        track: 'width: 48px; height: 26px; flex-shrink: 0; background: ' + (on ? acc : t.raised) + '; position: relative; ' + (st.chamfer ? cut(6) : 'border-radius: 999px'),
+        knob: 'position: absolute; top: 4px; left: ' + (on ? 26 : 4) + 'px; width: 18px; height: 18px; background: ' + (on ? onAcc : t.muted) + '; transition: left 0.15s; ' + (st.chamfer ? '' : 'border-radius: 999px')
+      };
+    };
+
+    const sizes = ['S', 'M', 'L'].map((z) => {
+      const sel = st.size === z;
+      return {
+        label: z === 'S' ? 'MAŁY' : z === 'M' ? 'ŚREDNI' : 'DUŻY',
+        pressed: sel ? 'true' : 'false',
+        pick: () => this.setState({ size: z }),
+        style: 'min-height: 48px; cursor: pointer; border: 0; ' + mono + 'font-size: 12px; font-weight: 700; letter-spacing: 1px; background: ' + (sel ? t.primary : t.raised) + '; color: ' + (sel ? t.onPrimary : t.ink) + '; ' + cut(8)
+      };
+    });
+
+    return {
+      s,
+      hatch: st.hatch,
+      presets,
+      accents,
+      toggles: [
+        tg('chamfer', 'Ścięte narożniki', 'CLIP: 45° / ROUND'),
+        tg('hatch', 'Kreskowanie', 'STRIPES // -45°'),
+        tg('deco', 'Etykiety terminala', '/PROC/SYS, _FRONT')
+      ],
+      sizes,
+      reset: () => this.setState({ theme: 'cyber', accent: null, chamfer: true, hatch: true, deco: true, size: 'M' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Fiszki — nowa fiszka</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&amp;family=Barlow:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#D6EA3C}a:hover{color:#E8F57A}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: radial-gradient(120% 80% at 50% 30%, #263334 0%, #1C2627 60%, #182122 100%); font-family: Barlow, system-ui, sans-serif; color: #E6EDEA; display: flex; flex-direction: column; position: relative; overflow: hidden">
+
+  <div style="position: absolute; left: -30px; bottom: 140px; width: 220px; height: 1px; background: #3A4A4B; transform: rotate(-45deg)"></div>
+
+  <div style="padding: 20px 16px 0; display: flex; align-items: center; gap: 8px">
+    <a href="Main.dc.html" aria-label="Zamknij" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E6EDEA">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </a>
+    <div style="flex: 1; display: flex; flex-direction: column">
+      <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8A9C9B; letter-spacing: 1px">CARD.NEW()</span>
+      <span style="font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; letter-spacing: 0.5px; line-height: 1.05">NOWA FISZKA</span>
+    </div>
+  </div>
+
+  <form style="flex: 1; padding: 20px 20px 0; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="deck" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #D6EA3C; letter-spacing: 1px">&gt; TALIA</label>
+      <div style="background: #47585A; padding: 1px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)">
+        <select id="deck" style="width: 100%; min-height: 50px; background: #1E2829; color: #E6EDEA; border: 0; padding: 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 600; clip-path: polygon(9.6px 0, 100% 0, 100% calc(100% - 9.6px), calc(100% - 9.6px) 100%, 0 100%, 0 9.6px)">
+          <option>ANGIELSKI B2</option>
+          <option>HISZPAŃSKI — PODSTAWY</option>
+          <option>SIECI KOMPUTEROWE</option>
+          <option>MATEMATYKA DYSKRETNA</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="front" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #D6EA3C; letter-spacing: 1px">&gt; PRZÓD</label>
+      <div style="background: #34C3AE; padding: 2px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)">
+        <input id="front" value="ubiquitous" style="width: 100%; box-sizing: border-box; min-height: 56px; background: #1E2829; color: #E6EDEA; border: 0; outline: 0; padding: 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; clip-path: polygon(9.2px 0, 100% 0, 100% calc(100% - 9.2px), calc(100% - 9.2px) 100%, 0 100%, 0 9.2px)">
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="back" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #D6EA3C; letter-spacing: 1px">&gt; TYŁ</label>
+      <div style="background: #47585A; padding: 1px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)">
+        <input id="back" placeholder="tłumaczenie..." style="width: 100%; box-sizing: border-box; min-height: 56px; background: #1E2829; color: #E6EDEA; border: 0; outline: 0; padding: 0 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; clip-path: polygon(9.6px 0, 100% 0, 100% calc(100% - 9.6px), calc(100% - 9.6px) 100%, 0 100%, 0 9.6px)">
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="ex" style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A9C9B; letter-spacing: 1px">&gt; PRZYKŁAD [OPCJONALNIE]</label>
+      <div style="background: #47585A; padding: 1px; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)">
+        <textarea id="ex" rows="3" placeholder="zdanie z użyciem słowa..." style="width: 100%; box-sizing: border-box; background: #1E2829; color: #E6EDEA; border: 0; outline: 0; padding: 12px 14px; resize: none; font-family: Barlow, sans-serif; font-size: 16px; display: block; clip-path: polygon(9.6px 0, 100% 0, 100% calc(100% - 9.6px), calc(100% - 9.6px) 100%, 0 100%, 0 9.6px)"></textarea>
+      </div>
+    </div>
+
+    <label for="rev" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; border-top: 1px solid #3A4A4B; border-bottom: 1px solid #3A4A4B; padding: 4px 0">
+      <span style="display: flex; flex-direction: column">
+        <span style="font-size: 16px; font-weight: 600">Dodaj też odwróconą</span>
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #8A9C9B">PL → EN</span>
+      </span>
+      <input id="rev" type="checkbox" checked style="width: 24px; height: 24px; accent-color: #D6EA3C">
+    </label>
+  </form>
+
+  <div style="padding: 16px 20px 28px; display: flex; gap: 10px">
+    <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; align-items: center; justify-content: center; background: #2E3B3C; color: #E6EDEA; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 1px; clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px)">ANULUJ</a>
+    <a href="Main.dc.html" style="flex: 2; min-height: 56px; display: flex; align-items: center; justify-content: center; gap: 10px; background: #D6EA3C; color: #141A12; text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 1px; clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)">
+      ZAPISZ_FISZKĘ
+      <span style="width: 22px; height: 12px; background: repeating-linear-gradient(-45deg, #141A12 0 2px, transparent 2px 5px)"></span>
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

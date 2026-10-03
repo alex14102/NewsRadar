@@ -1,0 +1,55 @@
+=====================================================================
+ PROMPT DLA CLAUDE — skopiuj całość poniżej linii i wklej Claude'owi
+ (najlepiej Claude Code uruchomiony w folderze Fiszki-starter)
+=====================================================================
+
+Cześć! Budujemy aplikację na Androida do nauki z fiszek — „Fiszki”.
+Pracuję na Kali Linux z Android Studio. Odpowiadaj po polsku.
+
+## Co już jest w tym folderze
+- Fiszki/ — projekt Android Studio: Kotlin + Jetpack Compose + Navigation Compose.
+  Pakiet: pl.fiszki.app, minSdk 26, compileSdk 35, AGP 8.7.3, Kotlin 2.1.0, Gradle 8.11.1.
+  Ekrany (ui/screens): HomeScreen (talie + kolejka na dziś), StudyScreen (nauka:
+  odwracanie karty, oceny ZNOWU/TRUDNE/DOBRZE/ŁATWE), AddCardScreen (nowa fiszka),
+  StatsScreen (statystyki), ThemeScreen (wygląd: 5 motywów, kolor akcentu,
+  ścięte/zaokrąglone narożniki, kreskowanie, etykiety terminala, rozmiar tekstu).
+  Motyw: ui/theme (Palettes.kt, Theme.kt — Tokens + Fiszki.t), komponenty w
+  ui/components/Components.kt (Panel, CyberButton, Hatch, MonoLabel, Headline,
+  TopBar, BottomBar, CyberToggle, CyberField).
+  Dane: data/Repository.kt trzyma wszystko w pamięci; data/Models.kt ma algorytm SM-2 (Srs).
+  Test jednostkowy: app/src/test/.../SrsTest.kt.
+- projekt-design/ — projekt graficzny z kanwy (pliki .dc.html = HTML z wyglądem
+  każdego ekranu, canvas.json = układ). Traktuj je jako WZÓR wyglądu.
+
+## Styl (trzymaj się go wszędzie)
+Cyber / terminal, wzorowany na okładce:
+- tło #1C2627 z radialnym poblaskiem #263334, linie #47585A
+- turkus #34C3AE = duże wypełnienia, limonka #D6EA3C = akcenty i przyciski CTA
+- tekst #E6EDEA, przygaszony #8A9C9B; na turkusie/limonce prawie czarny tekst
+- nagłówki: Barlow Condensed Bold, WERSALIKI; etykiety: JetBrains Mono
+  (np. _QUEUE.TODAY, /PROC/STATS, START_SESJI)
+- narożniki ścięte pod 45° (CutCornerShape(topStart, bottomEnd)), zero zaokrągleń
+  (chyba że użytkownik przełączy w ekranie Wygląd), kreskowanie -45°, cienkie linie
+- zawsze używaj kolorów z Fiszki.t (Tokens), NIGDY nie wpisuj kolorów na sztywno
+  w ekranach — inaczej przełączanie motywów przestanie działać
+- przyciski min. 48 dp wysokości, kontrast tekstu min. 4.5:1
+
+## Zadania — po kolei, po każdym kroku sprawdź, że projekt się buduje
+1. Upewnij się, że projekt się buduje: `cd Fiszki && ./gradlew assembleDebug`
+   oraz `./gradlew test`. Jeśli wersje bibliotek/AGP są niezgodne z moim Android
+   Studio, zaktualizuj je ostrożnie i powiedz, co zmieniłeś. Projekt NIE był
+   jeszcze kompilowany — popraw ewentualne błędy kompilacji.
+2. Fonty: pobierz Barlow Condensed (SemiBold, Bold) i JetBrains Mono (Regular,
+   Bold) z Google Fonts do app/src/main/res/font/ i podmień obiekt Fonts w Theme.kt.
+3. Trwałe dane: zamień Repository na bazę Room (encje Deck, Card, ReviewLog),
+   DAO z Flow, ViewModel(e) dla ekranów. Dane przykładowe wstaw tylko przy
+   pierwszym uruchomieniu.
+4. Zapis ustawień wyglądu w DataStore Preferences (ThemeSettings), wczytywanie przy starcie.
+5. Prawdziwe statystyki z ReviewLog: seria dni (streak), wykres 7 dni,
+   skuteczność, opanowane karty. Usuń dane PRZYKŁADOWE z Repository.
+6. Ekran listy kart w talii (edycja, usuwanie) + dodawanie/zmiana nazwy talii.
+7. Ikona aplikacji (adaptive icon) w stylu cyber: ścięty kwadrat, turkus + limonka.
+8. Na końcu: instrukcja jak zbudować podpisany APK do zainstalowania na telefonie.
+
+Pracuj małymi krokami, pokazuj mi co zmieniasz i pytaj, zanim zrobisz coś
+dużego (np. zmiana architektury). Nie usuwaj ekranów ani funkcji z ekranu Wygląd.

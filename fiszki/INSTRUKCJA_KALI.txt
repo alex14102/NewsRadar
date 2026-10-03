@@ -1,0 +1,47 @@
+=====================================================
+ FISZKI — uruchomienie na Kali Linux (krok po kroku)
+=====================================================
+
+1) PAKIETY SYSTEMOWE
+   sudo apt update
+   sudo apt install -y git unzip curl qemu-kvm adb
+   sudo adduser $USER kvm
+   -> wyloguj się i zaloguj ponownie (żeby grupa kvm zadziałała)
+
+2) ANDROID STUDIO
+   - Pobierz wersję dla Linuksa (.tar.gz) z: https://developer.android.com/studio
+   - Rozpakuj i uruchom (jako zwykły użytkownik, NIE root):
+       sudo tar -xzf ~/Pobrane/android-studio-*-linux.tar.gz -C /opt
+       /opt/android-studio/bin/studio.sh
+   - Kreator pobierze Android SDK. Javy nie trzeba instalować osobno.
+   - Skrót w menu: Tools -> Create Desktop Entry
+
+3) OTWARCIE PROJEKTU
+   unzip Fiszki-starter.zip -d ~/Projekty
+   W Android Studio: File -> Open -> ~/Projekty/Fiszki-starter/Fiszki
+   Poczekaj na „Gradle sync” (za pierwszym razem pobiera sporo plików).
+   Jeśli Studio zaproponuje aktualizację AGP/Gradle — możesz się zgodzić.
+
+4) URUCHOMIENIE
+   a) Emulator: Device Manager -> Create Device -> np. Pixel 8 -> obraz systemu
+      -> Run (zielony trójkąt).
+      Jeśli Kali działa w VirtualBox/VMware, emulator zwykle nie ruszy
+      (brak zagnieżdżonej wirtualizacji) — użyj telefonu (b).
+   b) Telefon: Ustawienia -> Informacje o telefonie -> 7x „Numer kompilacji”
+      -> Opcje programisty -> Debugowanie USB. Podłącz kabel, potwierdź na telefonie.
+      Sprawdź:  adb devices
+      Potem w Studio wybierz telefon i kliknij Run.
+
+5) BUDOWANIE Z TERMINALA (opcjonalnie)
+   cd ~/Projekty/Fiszki-starter/Fiszki
+   chmod +x gradlew
+   ./gradlew assembleDebug        # APK: app/build/outputs/apk/debug/app-debug.apk
+   ./gradlew test                 # testy algorytmu powtórek
+   adb install -r app/build/outputs/apk/debug/app-debug.apk
+   (terminal potrzebuje SDK: w pliku local.properties wpis
+    sdk.dir=/home/TWOJ_LOGIN/Android/Sdk — Studio tworzy go samo przy pierwszym otwarciu)
+
+6) DALEJ Z CLAUDE
+   Otwórz PROMPT_DLA_CLAUDE.txt, skopiuj treść i wklej Claude'owi.
+   Najwygodniej: Claude Code w terminalu, w folderze Fiszki-starter:
+       cd ~/Projekty/Fiszki-starter && claude
