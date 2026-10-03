@@ -1,12 +1,34 @@
 package pl.fiszki.app.data
 
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
+import androidx.room.PrimaryKey
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-data class Deck(val id: Long, val name: String, val short: String, val path: String)
+@Entity(tableName = "decks")
+data class Deck(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val name: String,
+    val short: String,
+    val path: String,
+)
 
+@Entity(
+    tableName = "cards",
+    foreignKeys = [
+        ForeignKey(
+            entity = Deck::class,
+            parentColumns = ["id"],
+            childColumns = ["deckId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+    ],
+    indices = [Index("deckId"), Index("dueAtMillis")],
+)
 data class Card(
-    val id: Long,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val deckId: Long,
     val front: String,
     val back: String,
@@ -17,6 +39,24 @@ data class Card(
     val reps: Int = 0,
     val dueAtMillis: Long = 0L,
 )
+
+/**
+ * Jedna ocena karty. Bez klucza obcego — historia (i statystyki) zostaje,
+ * nawet gdy karta albo talia zostanie usunięta.
+ * day = numer dnia (LocalDate.toEpochDay) w strefie telefonu w chwili powtórki.
+ */
+@Entity(tableName = "review_log", indices = [Index("day")])
+data class ReviewLog(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val cardId: Long,
+    val deckId: Long,
+    val rating: Rating,
+    val reviewedAt: Long,
+    val day: Long,
+)
+
+/** Wynik zapytania: ile powtórek danego dnia i ile z nich bez „ZNOWU”. */
+data class DayStat(val day: Long, val reviews: Int, val correct: Int)
 
 enum class Rating(val label: String) {
     AGAIN("ZNOWU"), HARD("TRUDNE"), GOOD("DOBRZE"), EASY("ŁATWE")

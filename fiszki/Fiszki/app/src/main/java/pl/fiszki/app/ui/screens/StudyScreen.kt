@@ -18,10 +18,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,8 +26,8 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import pl.fiszki.app.data.Rating
-import pl.fiszki.app.data.Repository
 import pl.fiszki.app.data.Srs
 import pl.fiszki.app.ui.components.CyberButton
 import pl.fiszki.app.ui.components.Hatch
@@ -41,19 +37,18 @@ import pl.fiszki.app.ui.components.Panel
 import pl.fiszki.app.ui.components.TopBar
 import pl.fiszki.app.ui.theme.Fiszki
 import pl.fiszki.app.ui.theme.Fonts
+import pl.fiszki.app.ui.viewmodel.StudyViewModel
 
 /** deckId = -1 → wszystkie talie. */
 @Composable
-fun StudyScreen(repo: Repository, deckId: Long, onBack: () -> Unit) {
+fun StudyScreen(vm: StudyViewModel, onBack: () -> Unit) {
     val t = Fiszki.t
-    val queue = remember {
-        repo.due(deckId.takeIf { it >= 0 }, System.currentTimeMillis()).map { it.id }.toMutableStateList()
-    }
-    val total = remember { queue.size }
-    var flipped by remember { mutableStateOf(false) }
-    val card = queue.firstOrNull()?.let { id -> repo.cards.firstOrNull { it.id == id } }
-    val deck = repo.decks.firstOrNull { it.id == deckId }
-    val doneCount = (total - queue.size).coerceAtLeast(0)
+    val ui by vm.ui.collectAsStateWithLifecycle()
+    val total = ui.total
+    val flipped = ui.flipped
+    val card = ui.card
+    val deck = ui.deck
+    val doneCount = ui.done.coerceAtLeast(0)
 
     Column(Modifier.fillMaxSize()) {
         TopBar(
@@ -77,7 +72,11 @@ fun StudyScreen(repo: Repository, deckId: Long, onBack: () -> Unit) {
             )
         }
 
-        if (card == null) {
+        if (ui.loading) {
+            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                MonoLabel("LOADING_QUEUE…", color = t.c.primary, bold = true)
+            }
+        } else if (card == null) {
             Column(
                 Modifier
                     .weight(1f)
@@ -86,9 +85,13 @@ fun StudyScreen(repo: Repository, deckId: Long, onBack: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
             ) {
                 MonoLabel("_SESSION.END", color = t.c.primary, bold = true)
-                Headline("Wszystko powtórzone", size = 44)
+                Headline(if (total == 0) "Nic do powtórki" else "Wszystko powtórzone", size = 44)
                 Spacer(Modifier.height(8.dp))
-                Text("Wróć później po kolejne karty.", color = t.c.muted, fontSize = 16.sp)
+                Text(
+                    if (total == 0) "Żadna karta nie czeka teraz na powtórkę." else "Powtórzone: $total. Wróć później po kolejne karty.",
+                    color = t.c.muted,
+                    fontSize = 16.sp,
+                )
             }
             CyberButton(
                 "WRÓĆ_DO_TALII", onBack,
@@ -150,7 +153,7 @@ fun StudyScreen(repo: Repository, deckId: Long, onBack: () -> Unit) {
                     .padding(20.dp)
             ) {
                 if (!flipped) {
-                    CyberButton("POKAŻ_ODPOWIEDŹ", { flipped = true }, Modifier.fillMaxWidth(), cut = 14.dp)
+                    CyberButton("POKAŻ_ODPOWIEDŹ", vm::flip, Modifier.fillMaxWidth(), cut = 14.dp)
                 } else {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Rating.entries.forEach { r ->
@@ -165,12 +168,7 @@ fun StudyScreen(repo: Repository, deckId: Long, onBack: () -> Unit) {
                                     .heightIn(min = 64.dp)
                                     .clip(t.shape(10.dp))
                                     .background(bg)
-                                    .clickable(role = Role.Button) {
-                                        repo.rate(card, r)
-                                        queue.removeAt(0)
-                                        if (r == Rating.AGAIN) queue.add(card.id)
-                                        flipped = false
-                                    },
+                                    .clickable(role = Role.Button) { vm.rate(r) },
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center,
                             ) {

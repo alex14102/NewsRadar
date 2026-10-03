@@ -15,25 +15,29 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import pl.fiszki.app.data.Repository
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import pl.fiszki.app.data.Stats
+import pl.fiszki.app.data.dni
 import pl.fiszki.app.ui.components.BottomBar
 import pl.fiszki.app.ui.components.Headline
 import pl.fiszki.app.ui.components.MonoLabel
 import pl.fiszki.app.ui.components.Panel
 import pl.fiszki.app.ui.theme.Fiszki
+import pl.fiszki.app.ui.viewmodel.StatsViewModel
 
 @Composable
-fun StatsScreen(repo: Repository, onTab: (String) -> Unit) {
+fun StatsScreen(vm: StatsViewModel, onTab: (String) -> Unit) {
     val t = Fiszki.t
-    val week = repo.weekHistory()
-    val max = (week.maxOfOrNull { it.second } ?: 1).coerceAtLeast(1)
-    val mastered = repo.cards.count { it.intervalDays >= 21 }
+    val ui by vm.ui.collectAsStateWithLifecycle()
+    val week = ui.week
+    val max = (week.maxOfOrNull { it.count } ?: 1).coerceAtLeast(1)
 
     Box(Modifier.fillMaxSize()) {
         Column(
@@ -55,11 +59,11 @@ fun StatsScreen(repo: Repository, onTab: (String) -> Unit) {
                         .padding(16.dp)
                 ) {
                     MonoLabel("STREAK", color = t.onAccent, size = 10, bold = true)
-                    Headline("${repo.streakDays} dni", size = 44, color = t.onAccent)
+                    Headline(dni(ui.streak), size = 44, color = t.onAccent)
                 }
                 Panel(Modifier.weight(1f), cut = 18.dp) {
-                    MonoLabel("SKUTECZNOŚĆ DZIŚ", size = 10)
-                    Headline(repo.retentionLabel(), size = 44, color = t.c.primary)
+                    MonoLabel("SKUTECZNOŚĆ 7 DNI", size = 10)
+                    Headline(ui.retentionWeek.percent(), size = 44, color = t.c.primary)
                 }
             }
 
@@ -81,8 +85,7 @@ fun StatsScreen(repo: Repository, onTab: (String) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.Bottom,
             ) {
-                week.forEachIndexed { i, (day, n) ->
-                    val today = i == week.lastIndex
+                week.forEach { (day, n, today) ->
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         MonoLabel("$n", size = 10)
                         Spacer(Modifier.height(4.dp))
@@ -101,9 +104,11 @@ fun StatsScreen(repo: Repository, onTab: (String) -> Unit) {
 
             Column(Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
                 listOf(
-                    "Wszystkie karty" to "${repo.cards.size}",
-                    "Opanowane (≥21 dni)" to "$mastered",
-                    "Powtórzone dziś" to "${repo.reviewedToday}",
+                    "Wszystkie karty" to "${ui.totalCards}",
+                    "Opanowane (≥${Stats.MASTERED_DAYS} dni)" to "${ui.mastered}",
+                    "Powtórzone dziś" to "${ui.reviewedToday}",
+                    "Skuteczność dziś" to ui.retentionToday.percent(),
+                    "Powtórki łącznie" to "${ui.reviewsAllTime}",
                 ).forEach { (k, v) ->
                     Box(Modifier.fillMaxWidth().height(1.dp).background(t.c.line))
                     Row(
@@ -123,3 +128,5 @@ fun StatsScreen(repo: Repository, onTab: (String) -> Unit) {
         BottomBar("stats", onTab, Modifier.align(Alignment.BottomCenter))
     }
 }
+
+private fun Int?.percent() = if (this == null) "—" else "$this%"

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import pl.fiszki.app.ui.theme.Fiszki
 import pl.fiszki.app.ui.theme.Fonts
 import kotlin.math.roundToInt
@@ -300,5 +301,75 @@ fun CyberField(
             singleLine = big,
             minLines = minLines,
         )
+    }
+}
+
+/** Okno dialogowe w stylu aplikacji (ścięty panel z obrysem). */
+@Composable
+fun CyberDialog(
+    title: String,
+    sub: String,
+    onDismiss: () -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Panel(
+            Modifier.fillMaxWidth(),
+            cut = 18.dp,
+            fill = Fiszki.t.c.bg,
+            padding = PaddingValues(20.dp),
+        ) {
+            MonoLabel(sub, size = 10, decorative = true)
+            Headline(title, size = 26)
+            Spacer(Modifier.height(16.dp))
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
+        }
+    }
+}
+
+/** Pytanie „na pewno?” z przyciskami ANULUJ / [confirm]. */
+@Composable
+fun ConfirmDialog(
+    title: String,
+    message: String,
+    confirm: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val t = Fiszki.t
+    CyberDialog(title, "SYS://CONFIRM", onDismiss) {
+        Text(message, color = t.c.ink, fontSize = 16.sp)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            CyberButton("ANULUJ", onDismiss, Modifier.weight(1f), bg = t.c.raised, fg = t.c.ink)
+            CyberButton(confirm, onConfirm, Modifier.weight(1f))
+        }
+    }
+}
+
+/** Nowa talia / zmiana nazwy: nazwa + krótki kod (np. EN). */
+@Composable
+fun DeckFormDialog(
+    title: String,
+    initialName: String,
+    initialShort: String,
+    confirm: String,
+    onConfirm: (name: String, short: String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val t = Fiszki.t
+    var name by remember { mutableStateOf(initialName) }
+    var short by remember { mutableStateOf(initialShort) }
+    CyberDialog(title, "DECK.EDIT()", onDismiss) {
+        CyberField("> NAZWA", name, { name = it })
+        CyberField("> KOD [MAX 4, OPCJONALNIE]", short, { short = it.take(4).uppercase() })
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            CyberButton("ANULUJ", onDismiss, Modifier.weight(1f), bg = t.c.raised, fg = t.c.ink)
+            CyberButton(
+                confirm,
+                onClick = { onConfirm(name.trim(), short.trim()) },
+                modifier = Modifier.weight(1f),
+                enabled = name.isNotBlank(),
+            )
+        }
     }
 }

@@ -5,3 +5,7 @@ local.properties
 *.iml
 .DS_Store
 captures/
+# klucz do podpisu i hasła — nigdy do repozytorium
+keystore.properties
+*.jks
+*.keystore

@@ -49,7 +49,7 @@ private fun Section(title: String, content: @Composable ColumnScope.() -> Unit) 
     }
 }
 
-/** Zmiany działają od razu w całej aplikacji. TODO: zapis w DataStore. */
+/** Zmiany działają od razu w całej aplikacji i są zapisywane (DataStore). */
 @Composable
 fun ThemeScreen(settings: ThemeSettings, onChange: (ThemeSettings) -> Unit, onTab: (String) -> Unit) {
     val t = Fiszki.t

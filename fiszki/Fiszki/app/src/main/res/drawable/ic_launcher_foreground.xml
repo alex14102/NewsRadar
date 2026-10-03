@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ścięty kwadrat (turkus), litera F, kreskowanie -45° i narożnik (limonka). Mieści się w strefie bezpiecznej 66 dp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:fillColor="#34C3AE" android:pathData="M42,31H77V66L66,77H31V42Z" />
+    <group>
+        <clip-path android:pathData="M42,31H77V66L66,77H31V42Z" />
+        <path android:fillColor="#D6EA3C" android:pathData="M52,77L58,77L77,58L77,52Z" />
+        <path android:fillColor="#D6EA3C" android:pathData="M62,77L68,77L77,68L77,62Z" />
+    </group>
+    <path android:fillColor="#0F1A1A" android:pathData="M43,41H65V47H49V52H61V58H49V68H43Z" />
+    <path android:fillColor="#D6EA3C" android:pathData="M28,80H40V82H26V68H28Z" />
+</vector>
