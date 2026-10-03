@@ -1,0 +1,50 @@
+=====================================================
+ FISZKI — podpisany APK na telefon (krok po kroku)
+=====================================================
+
+Wersja debug (app-debug.apk) też się instaluje, ale do „prawdziwego” użytku
+lepszy jest APK release podpisany WŁASNYM kluczem. Ten sam klucz musi podpisywać
+każdą kolejną wersję — inaczej telefon nie zainstaluje aktualizacji
+(trzeba by odinstalować aplikację i stracić dane).
+
+1) KLUCZ (raz na zawsze)
+   mkdir -p ~/klucze
+   keytool -genkeypair -v \
+     -keystore ~/klucze/fiszki-release.jks \
+     -alias fiszki -keyalg RSA -keysize 2048 -validity 10000
+   - keytool jest w JDK z Android Studio:
+       /opt/android-studio/jbr/bin/keytool
+   - Zapamiętaj hasło. Zrób kopię pliku .jks (np. na pendrive) — bez niego
+     nie wydasz aktualizacji.
+   - NIE wrzucaj .jks ani haseł do gita (są w .gitignore).
+
+2) DANE DO PODPISU
+   cd ~/Projekty/Fiszki-starter/Fiszki
+   cp keystore.properties.example keystore.properties
+   nano keystore.properties      # wpisz ścieżkę do .jks, alias i hasła
+   (app/build.gradle.kts sam czyta ten plik; bez niego release jest niepodpisany)
+
+3) BUDOWANIE
+   ./gradlew assembleRelease
+   -> app/build/outputs/apk/release/app-release.apk
+
+   Sprawdzenie podpisu (opcjonalnie):
+   ~/Android/Sdk/build-tools/<wersja>/apksigner verify --print-certs \
+     app/build/outputs/apk/release/app-release.apk
+
+   Alternatywa w Android Studio: Build -> Generate Signed App Bundle / APK -> APK
+   -> wskaż ten sam .jks -> release.
+
+4) INSTALACJA NA TELEFONIE
+   a) Kablem:  adb install -r app/build/outputs/apk/release/app-release.apk
+   b) Bez kabla: skopiuj plik .apk na telefon (np. Bluetooth, chmura),
+      otwórz go menedżerem plików i zezwól na „instalowanie nieznanych aplikacji”
+      dla tej aplikacji, z której otwierasz plik.
+   Uwaga: jeśli wcześniej była zainstalowana wersja debug, Android odmówi
+   aktualizacji (inny podpis) — odinstaluj ją najpierw (dane debugowej wersji znikną).
+
+5) KOLEJNE WERSJE
+   W app/build.gradle.kts zwiększ versionCode (np. 1 -> 2) i versionName,
+   potem znowu ./gradlew assembleRelease i adb install -r ….
+   Baza Room ma wersję 1 — jeśli kiedyś zmienimy encje, trzeba będzie dodać
+   migrację, żeby aktualizacja nie skasowała danych.
