@@ -12,7 +12,6 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -20,7 +19,7 @@ enum class TextSize(val label: String, val wordSp: Int) {
     S("MAŁY", 34), M("ŚREDNI", 42), L("DUŻY", 52)
 }
 
-/** Ustawienia z ekranu „Wygląd”. TODO: zapisywać w DataStore. */
+/** Ustawienia z ekranu „Wygląd” (zapisywane w DataStore — data/SettingsStore.kt). */
 data class ThemeSettings(
     val palette: PaletteId = PaletteId.CYBER,
     val accent: AccentOption? = null,
@@ -47,15 +46,6 @@ val LocalTokens = staticCompositionLocalOf<Tokens> { error("Brak FiszkiTheme") }
 object Fiszki {
     val t: Tokens
         @Composable @ReadOnlyComposable get() = LocalTokens.current
-}
-
-/**
- * Fonty. TODO: wrzucić do res/font pliki Barlow Condensed (Bold/SemiBold)
- * i JetBrains Mono, a potem podmienić na FontFamily(Font(R.font.…)).
- */
-object Fonts {
-    val Display: FontFamily = FontFamily.SansSerif
-    val Mono: FontFamily = FontFamily.Monospace
 }
 
 @Composable
