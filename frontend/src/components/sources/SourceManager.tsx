@@ -26,6 +26,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   biznes: "BIZNES",
   nauka: "NAUKA",
   technologia: "TECHNOLOGIA",
+  ai: "AI & GITHUB",
   video: "VIDEO",
   social: "SOCIAL",
   podcast: "PODCAST",

@@ -18,6 +18,7 @@ const CATEGORIES: { id: Category; label: string; dot?: string }[] = [
   { id: "biznes",      label: "BIZNES",      dot: "#3a86ff" },
   { id: "nauka",       label: "NAUKA",       dot: "#06d6a0" },
   { id: "technologia", label: "TECH",        dot: "#7c3aed" },
+  { id: "ai",          label: "AI",          dot: "#8957e5" },
   { id: "video",       label: "VIDEO",       dot: "#ff0000" },
   { id: "social",      label: "SOCIAL",      dot: "#00ff99" },
   { id: "podcast",     label: "PODCAST",     dot: "#f77f00" },

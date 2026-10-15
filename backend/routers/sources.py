@@ -44,6 +44,16 @@ PRESET_SOURCES = [
     {"name": "TechCrunch",       "url": "https://techcrunch.com/feed/",                                                   "source_type": "rss",     "category": "technologia", "color": "#0d9e16"},
     {"name": "Wired",            "url": "https://www.wired.com/feed/rss",                                                 "source_type": "rss",     "category": "technologia", "color": "#b5a642"},
     {"name": "Ars Technica",     "url": "https://feeds.arstechnica.com/arstechnica/index",                                "source_type": "rss",     "category": "technologia", "color": "#ff6600"},
+    # AI — sztuczna inteligencja + nowinki z GitHuba
+    {"name": "GitHub Blog AI",   "url": "https://github.blog/ai-and-ml/feed/",                                            "source_type": "rss",     "category": "ai",          "color": "#8957e5"},
+    {"name": "GitHub Changelog", "url": "https://github.blog/changelog/feed/",                                            "source_type": "rss",     "category": "ai",          "color": "#6e7681"},
+    {"name": "GitHub Trending",  "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",                   "source_type": "rss",     "category": "ai",          "color": "#238636"},
+    {"name": "OpenAI",           "url": "https://openai.com/news/rss.xml",                                                "source_type": "rss",     "category": "ai",          "color": "#10a37f"},
+    {"name": "Google AI",        "url": "https://blog.google/technology/ai/rss/",                                         "source_type": "rss",     "category": "ai",          "color": "#4285f4"},
+    {"name": "Hugging Face",     "url": "https://huggingface.co/blog/feed.xml",                                           "source_type": "rss",     "category": "ai",          "color": "#ffbf00"},
+    {"name": "TechCrunch AI",    "url": "https://techcrunch.com/category/artificial-intelligence/feed/",                  "source_type": "rss",     "category": "ai",          "color": "#0a8f13"},
+    {"name": "The Verge AI",     "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",              "source_type": "rss",     "category": "ai",          "color": "#e2127a"},
+    {"name": "MIT Tech Review",  "url": "https://www.technologyreview.com/topic/artificial-intelligence/feed",            "source_type": "rss",     "category": "ai",          "color": "#a31f34"},
     # VIDEO — YouTube
     {"name": "Damian Olszewski", "url": "https://www.youtube.com/feeds/videos.xml?channel_id=UC9TWnOWxa6wdbPEZYYVpJTQ",  "source_type": "youtube", "category": "video",       "color": "#ff0000"},
     # SOCIAL — X (Twitter)
